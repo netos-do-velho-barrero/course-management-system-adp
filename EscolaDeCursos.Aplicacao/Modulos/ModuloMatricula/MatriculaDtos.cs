@@ -1,3 +1,4 @@
+
 using EscolaDeCursos.Dominio.Modulos.ModuloMatricula;
 
 namespace EscolaDeCursos.Aplicacao.Modulos.ModuloMatricula;
