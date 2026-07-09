@@ -22,22 +22,20 @@ public class Turma : EntidadeBase<Turma>
     }
 
     public override List<string> Validar()
-    {
-        List<string> erros = [];
+{
+    List<string> erros = [];
 
-        if (CursoId == Guid.Empty) erros.Add("O campo 'Curso' é obrigatório.");
-        if (InstrutorId == Guid.Empty) erros.Add("O campo 'Instrutor' é obrigatório.");
+    if (CursoId == Guid.Empty) erros.Add("O campo 'Curso' é obrigatório.");
+    if (InstrutorId == Guid.Empty) erros.Add("O campo 'Instrutor' é obrigatório.");
 
-       
-        if (NumeroMaximoAlunos <= 0)
-            erros.Add("O número máximo de alunos deve ser maior que zero.");
+    if (NumeroMaximoAlunos <= 0)
+        erros.Add("O número máximo de alunos deve ser maior que zero.");
 
+    if (DataTermino <= DataInicio)
+        erros.Add("A data de término da turma deve ser posterior à data de início.");
 
-        if (DataTermino <= DataInicio)
-            erros.Add("A data de término da turma deve ser posterior à data de início.");
-
-        return erros;
-    }
+    return erros;
+}
 
     public override void Atualizar(Turma entidadeAtualizada)
     {

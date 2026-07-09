@@ -7,7 +7,7 @@ public class Matricula : EntidadeBase<Matricula>
     public Guid AlunoId { get; set; }
     public Guid TurmaId { get; set; }
     public DateTime DataMatricula { get; set; }
-    public SituacaoMatricula Situacao { get; set; } 
+    public SituacaoMatricula Situacao { get; set; }
 
     public Matricula() { }
 
@@ -29,7 +29,7 @@ public class Matricula : EntidadeBase<Matricula>
 
         return erros;
     }
-
+    
     public override void Atualizar(Matricula entidadeAtualizada)
     {
         Situacao = entidadeAtualizada.Situacao;

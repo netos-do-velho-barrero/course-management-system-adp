@@ -30,7 +30,6 @@ public class Instrutor : EntidadeBase<Instrutor>
 
         if (string.IsNullOrWhiteSpace(Email) || !Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             erros.Add("O campo 'Email' deve conter um e-mail válido.");
-
         return erros;
     }
 

@@ -2,16 +2,19 @@ using EscolaDeCursos.Dominio.Compartilhado;
 
 namespace EscolaDeCursos.Dominio.Modulos.ModuloAula;
 
-public class ModuloAula : EntidadeBase<ModuloAula>
+public class Aula : EntidadeBase<Aula>
 {
     public string Titulo { get; set; } = string.Empty;
     public Guid CursoId { get; set; }
     public int Ordem { get; set; }
-    public int Duracao { get; set; } 
+    public int Duracao { get; set; }
 
-    public ModuloAula() { }
+    public Aula()
+    {
+        
+    }
 
-    public ModuloAula(string titulo, Guid cursoId, int ordem, int duracao)
+    public Aula(string titulo, Guid cursoId, int ordem, int duracao)
     {
         Titulo = titulo;
         CursoId = cursoId;
@@ -38,7 +41,7 @@ public class ModuloAula : EntidadeBase<ModuloAula>
         return erros;
     }
 
-    public override void Atualizar(ModuloAula entidadeAtualizada)
+    public override void Atualizar(Aula entidadeAtualizada)
     {
         Titulo = entidadeAtualizada.Titulo;
         CursoId = entidadeAtualizada.CursoId;
