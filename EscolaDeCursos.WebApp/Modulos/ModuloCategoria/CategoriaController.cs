@@ -3,9 +3,8 @@ using FluentResults;
 using EscolaDeCursos.WebApp.Compartilhado.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using EscolaDeCursos.Aplicacao.Modulos.ModuloCategoria;
-using EscolaDeCursos.WebApp.Modulos.ModuloCategoria;
 
-namespace eAgenda.WebApp.Modulos.ModuloCategoria.Apresentacao;
+namespace EscolaDeCursos.WebApp.Modulos.ModuloCategoria;
 
 public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mapeador) : Controller
 {
@@ -14,7 +13,7 @@ public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mape
     {
         List<ListarCategoriaDto> dtos = servicoCategoria.SelecionarTodos();
 
-        List<ListarCategoriaDto> listarVms = mapeador.Map<List<ListarCategoriaDto>>(dtos);
+        List<ListarCategoriasViewModel> listarVms = mapeador.Map<List<ListarCategoriasViewModel>>(dtos);
 
         return View(listarVms);
     }
