@@ -20,6 +20,13 @@ public static class InjecaoDependencia
         services.AddScoped<ServicoAluno>();
       //  services.AddScoped<ServicoTurma>();
        // services.AddScoped<ServicoMatricula>();
+        services.AddScoped<ServicoCategoria>();
+        // services.AddScoped<ServicoCurso>();
+        // services.AddScoped<ServicoAula>();
+        // services.AddScoped<ServicoInstrutor>();
+        // services.AddScoped<ServicoAluno>();
+        // services.AddScoped<ServicoTurma>();
+        // services.AddScoped<ServicoMatricula>();
 
         return services;
     }
