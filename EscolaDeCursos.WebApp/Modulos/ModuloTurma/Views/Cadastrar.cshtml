@@ -1,0 +1,57 @@
+@model EscolaDeCursos.WebApp.Modulos.ModuloTurma.CadastrarTurmaViewModel
+
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Cadastrar Nova Turma";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm col-md-6 mx-auto border-0">
+        <div class="card-header bg-dark text-white p-3">
+            <h4 class="mb-0">@ViewBag.Title</h4>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Cadastrar" method="post">
+                <div class="mb-3">
+                    <label asp-for="CursoId" class="form-label fw-bold">Curso</label>
+                    <select asp-for="CursoId" asp-items="ViewBag.Cursos" class="form-select">
+                        <option value="">Selecione um Curso...</option>
+                    </select>
+                    <span asp-validation-for="CursoId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="InstrutorId" class="form-label fw-bold">Instrutor</label>
+                    <select asp-for="InstrutorId" asp-items="ViewBag.Instrutores" class="form-select">
+                        <option value="">Selecione um Instrutor...</option>
+                    </select>
+                    <span asp-validation-for="InstrutorId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DataInicio" class="form-label fw-bold">Data de Início</label>
+                    <input asp-for="DataInicio" type="date" class="form-control" />
+                    <span asp-validation-for="DataInicio" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DataTermino" class="form-label fw-bold">Data de Término</label>
+                    <input asp-for="DataTermino" type="date" class="form-control" />
+                    <span asp-validation-for="DataTermino" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="NumeroMaximoAlunos" class="form-label fw-bold">Número Máximo de Alunos</label>
+                    <input asp-for="NumeroMaximoAlunos" type="number" class="form-control" />
+                    <span asp-validation-for="NumeroMaximoAlunos" class="text-danger"></span>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-success px-4">Salvar</button>
+                    <a asp-action="Listar" class="btn btn-secondary px-4">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
