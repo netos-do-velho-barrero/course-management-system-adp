@@ -16,7 +16,7 @@ public sealed class EscolaDeCursosDbContext(
 {
 
     public DbSet<Aluno> Alunos => Set<Aluno>();
-    // public DbSet<Aula> Aulas => Set<Aula>();
+    public DbSet<Aula> Aulas => Set<Aula>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
     public DbSet<Instrutor> Instrutores => Set<Instrutor>();
     public DbSet<Curso> Cursos => Set<Curso>();

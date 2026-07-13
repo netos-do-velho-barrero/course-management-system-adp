@@ -14,14 +14,13 @@ public static class InjecaoDependencia
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
 
-      //  services.AddScoped<ServicoAula>();
         services.AddScoped<ServicoInstrutor>();
         services.AddScoped<ServicoAluno>();
         services.AddScoped<ServicoTurma>();
         services.AddScoped<ServicoMatricula>();
         services.AddScoped<ServicoCategoria>();
         services.AddScoped<ServicoCurso>();
-        // services.AddScoped<ServicoAula>();
+        services.AddScoped<ServicoAula>();
 
         return services;
     }

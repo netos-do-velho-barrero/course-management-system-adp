@@ -24,6 +24,10 @@
                 Cursos
             </a>
 
+            <a class="btn btn-primary rounded-pill px-4" asp-controller="Aula" asp-action="Listar">
+                Aulas
+            </a>
+
             <a class="btn btn-primary rounded-pill px-4" asp-controller="Turma" asp-action="Listar">
                 Turmas
             </a>
@@ -74,6 +78,13 @@
                     <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                        asp-controller="Curso" asp-action="Listar">
                         Módulo de Cursos
+                        <span class="badge text-bg-primary rounded-pill">Abrir</span>
+                    </a>
+
+
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       asp-controller="Aula" asp-action="Listar">
+                        Módulo de Aulas
                         <span class="badge text-bg-primary rounded-pill">Abrir</span>
                     </a>
 

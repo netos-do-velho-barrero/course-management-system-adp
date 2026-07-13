@@ -32,20 +32,27 @@ public class ServicoAula : ServicoBase<Aula>
 
     public Result Editar(EditarAulaDto dto)
     {
+        Aula? aula = repositorioAula.SelecionarPorId(dto.Id);
+
+        if (aula == null)
+            return Result.Fail("Aula não encontrada.");
+
         if (repositorioAula.ExisteOrdemNoCurso(dto.Ordem, dto.CursoId, dto.Id))
             return Falha(nameof(dto.Ordem), "A ordem da aula dentro de um mesmo curso não pode se repetir.");
 
-        Aula aula = new Aula(dto.Titulo, dto.CursoId, dto.Ordem, dto.Duracao);
+        Aula aulaAtualizada = new Aula(dto.Titulo, dto.CursoId, dto.Ordem, dto.Duracao);
 
-        Result resultadoValidacao = ValidarEntidade(aula);
+        Result resultadoValidacao = ValidarEntidade(aulaAtualizada);
 
         if (resultadoValidacao.IsFailed)
             return resultadoValidacao;
 
+        aula.Atualizar(aulaAtualizada);
+
         bool conseguiuEditar = repositorioAula.Editar(dto.Id, aula);
 
         if (!conseguiuEditar)
-            return Result.Fail("Aula não encontrada.");
+            return Result.Fail("Erro ao atualizar os dados da aula.");
 
         return Result.Ok();
     }
