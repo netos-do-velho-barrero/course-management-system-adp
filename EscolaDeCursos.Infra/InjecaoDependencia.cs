@@ -1,3 +1,4 @@
+using eAgenda.WebApp.Modulos.ModuloCategoria.Infra;
 using EscolaDeCursos.Dominio.Modulos.ModuloAluno;
 using EscolaDeCursos.Dominio.Modulos.ModuloAula;
 using EscolaDeCursos.Dominio.Modulos.ModuloCategoria;
@@ -50,7 +51,7 @@ public static class InjecaoDependencia
 
        // services.AddScoped<IRepositorioAluno, RepositorioAlunoEmOrm>();
        // services.AddScoped<IRepositorioAula, RepositorioAulaEmOrm>();
-       // services.AddScoped<IRepositorioCategoria, RepositorioCategoriaEmOrm>();
+       services.AddScoped<IRepositorioCategoria, RepositorioCategoriaEmOrm>();
       //  services.AddScoped<IRepositorioCurso, RepositorioCursoEmOrm>();
        // services.AddScoped<IRepositorioInstrutor, RepositorioInstrutorEmOrm>();
       //  services.AddScoped<IRepositorioMatricula, RepositorioMatriculaEmOrm>();
