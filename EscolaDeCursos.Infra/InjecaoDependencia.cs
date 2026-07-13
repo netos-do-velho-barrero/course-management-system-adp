@@ -9,6 +9,7 @@ using EscolaDeCursos.Dominio.Modulos.ModuloTurma;
 using EscolaDeCursos.Infra.Comartilhado.Logging;
 using EscolaDeCursos.Infra.Compartilhado.Orm;
 using EscolaDeCursos.Infra.Modulos.ModuloAluno;
+using EscolaDeCursos.Infra.Orm.Modulos.ModuloMatricula;
 using EscolaDeCursos.Infra.Orm.Modulos.ModuloTurma;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -56,7 +57,7 @@ public static class InjecaoDependencia
        // services.AddScoped<IRepositorioAula, RepositorioAulaEmOrm>();
       //  services.AddScoped<IRepositorioCurso, RepositorioCursoEmOrm>();
        // services.AddScoped<IRepositorioInstrutor, RepositorioInstrutorEmOrm>();
-      //  services.AddScoped<IRepositorioMatricula, RepositorioMatriculaEmOrm>();
+        services.AddScoped<IRepositorioMatricula, RepositorioMatriculaEmOrm>();
         services.AddScoped<IRepositorioTurma, RepositorioTurmaEmOrm>();
     }
 }

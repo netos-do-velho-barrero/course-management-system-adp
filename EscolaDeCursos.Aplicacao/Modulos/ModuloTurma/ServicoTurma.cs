@@ -58,7 +58,7 @@ public class ServicoTurma : ServicoBase<Turma>
     {
         return repositorioTurma
             .SelecionarTodos()
-            .Select(t => new ListarTurmaDto(t.Id, t.CursoId, t.DataInicio, t.DataTermino, t.NumeroMaximoAlunos))
+            .Select(t => new ListarTurmaDto(t.Id, t.CursoId, t.InstrutorId, t.DataInicio, t.DataTermino, t.NumeroMaximoAlunos))
             .ToList();
     }
 

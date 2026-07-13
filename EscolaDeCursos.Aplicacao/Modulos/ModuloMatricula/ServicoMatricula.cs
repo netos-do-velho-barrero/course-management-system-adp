@@ -22,31 +22,48 @@ public class ServicoMatricula : ServicoBase<Matricula>
         this.repositorioTurma = repositorioTurma;
     }
 
-    public Result Cadastrar(CadastrarMatriculaDto dto)
+   public Result Cadastrar(CadastrarMatriculaDto dto)
+{
+    // RN24: Somente alunos previamente cadastrados podem ser matriculados
+    Aluno? aluno = repositorioAluno.SelecionarPorId(dto.AlunoId);
+    if (aluno == null)
+        return Falha(nameof(dto.AlunoId), "Aluno não encontrado.");
+
+    // RN25: Somente turmas previamente cadastradas podem receber matrículas
+    Turma? turma = repositorioTurma.SelecionarPorId(dto.TurmaId);
+    if (turma == null)
+        return Falha(nameof(dto.TurmaId), "Turma não encontrada.");
+
+    // RN22: Um aluno não pode ser matriculado duas vezes na mesma turma
+    if (repositorioMatricula.ExisteMatriculaNaTurma(dto.AlunoId, dto.TurmaId))
+        return Falha(nameof(dto.AlunoId), "Este aluno já está matriculado nesta turma.");
+
+    // RN23: Não pode haver matrículas acima da capacidade máxima da turma
+    int matriculasAtivas = repositorioMatricula.ContarMatriculasAtivasNaTurma(dto.TurmaId);
+    if (matriculasAtivas >= turma.NumeroMaximoAlunos)
+        return Falha(nameof(dto.TurmaId), "A turma já atingiu o número máximo de alunos.");
+
+    Matricula matricula = new Matricula(dto.AlunoId, dto.TurmaId, dto.Situacao);
+
+    Result resultadoValidacao = ValidarEntidade(matricula);
+    if (resultadoValidacao.IsFailed)
+        return resultadoValidacao;
+
+    repositorioMatricula.Cadastrar(matricula);
+
+    return Result.Ok();
+}
+
+    public Result Editar(EditarMatriculaDto dto)
     {
-        Aluno? aluno = repositorioAluno.SelecionarPorId(dto.AlunoId);
-        if (aluno == null)
-            return Falha(nameof(dto.AlunoId), "Aluno não encontrado.");
+        Matricula? matricula = repositorioMatricula.SelecionarPorId(dto.Id);
 
-        Turma? turma = repositorioTurma.SelecionarPorId(dto.TurmaId);
-        if (turma == null)
-            return Falha(nameof(dto.TurmaId), "Turma não encontrada.");
+        if (matricula == null)
+            return Result.Fail("Matrícula não encontrada.");
 
-        if (repositorioMatricula.ExisteMatriculaNaTurma(dto.AlunoId, dto.TurmaId))
-            return Falha(nameof(dto.AlunoId), "Este aluno já está matriculado nesta turma.");
+        matricula.Situacao = dto.Situacao;
 
-        int matriculasAtivas = repositorioMatricula.ContarMatriculasAtivasNaTurma(dto.TurmaId);
-        if (matriculasAtivas >= turma.NumeroMaximoAlunos)
-            return Falha(nameof(dto.TurmaId), "A turma já atingiu o número máximo de alunos.");
-
-        Matricula matricula = new Matricula(dto.AlunoId, dto.TurmaId, SituacaoMatricula.Ativa);
-
-        Result resultadoValidacao = ValidarEntidade(matricula);
-
-        if (resultadoValidacao.IsFailed)
-            return resultadoValidacao;
-
-        repositorioMatricula.Cadastrar(matricula);
+        repositorioMatricula.Editar(dto.Id, matricula);
 
         return Result.Ok();
     }
