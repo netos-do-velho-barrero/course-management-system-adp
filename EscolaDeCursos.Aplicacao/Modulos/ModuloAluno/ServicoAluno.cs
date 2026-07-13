@@ -60,11 +60,11 @@ public class ServicoAluno : ServicoBase<Aluno>
         return Result.Ok();
     }
 
-    public List<ListarAlunosDto> SelecionarTodos()
+    public List<ListarAlunoDto> SelecionarTodos()
     {
         return repositorioAluno
             .SelecionarTodos()
-            .Select(a => new ListarAlunosDto(a.Id, a.Nome, a.Cpf, a.Email))
+            .Select(a => new ListarAlunoDto(a.Id, a.Nome, a.Cpf, a.Email))
             .ToList();
     }
 

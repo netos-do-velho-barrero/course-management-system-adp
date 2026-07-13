@@ -1,0 +1,111 @@
+using AutoMapper;
+using FluentResults;
+using EscolaDeCursos.Aplicacao.Modulos.ModuloAluno;
+using Microsoft.AspNetCore.Mvc;
+using EscolaDeCursos.WebApp.Compartilhado.Extensions;
+
+namespace EscolaDeCursos.WebApp.Modulos.ModuloAluno;
+
+public class AlunoController(ServicoAluno servicoAluno, IMapper mapeador) : Controller
+{
+    [HttpGet]
+    public ActionResult Listar()
+    {
+        List<ListarAlunoDto> dtos = servicoAluno.SelecionarTodos();
+
+        List<ListarAlunoViewModel> listarVms = mapeador.Map<List<ListarAlunoViewModel>>(dtos);
+
+        return View(listarVms);
+    }
+
+    [HttpGet]
+    [HttpGet]
+    public ActionResult Cadastrar()
+    {
+        CadastrarAlunoViewModel cadastrarVm = new CadastrarAlunoViewModel();
+
+        return View(cadastrarVm);
+    }
+    
+
+    [HttpPost]
+    public ActionResult Cadastrar(CadastrarAlunoViewModel cadastrarVm)
+    {
+        if (!ModelState.IsValid)
+            return View(cadastrarVm);
+
+        CadastrarAlunoDto dto = mapeador.Map<CadastrarAlunoDto>(cadastrarVm);
+
+        Result resultado = servicoAluno.Cadastrar(dto);
+
+        if (resultado.IsFailed)
+        {
+            ModelState.AddModelError(resultado);
+            return View(cadastrarVm);
+        }
+
+        return RedirectToAction(nameof(Listar));
+    }
+
+    [HttpGet]
+    public ActionResult Editar(Guid id)
+    {
+        Result<DetalhesAlunoDto> resultado = servicoAluno.SelecionarPorId(id);
+
+        if (resultado.IsFailed)
+        {
+            TempData.AddErrorMessage(resultado);
+            return RedirectToAction(nameof(Listar));
+        }
+
+        EditarAlunoViewModel editarVm = mapeador.Map<EditarAlunoViewModel>(resultado.Value);
+
+        return View(editarVm);
+    }
+
+    [HttpPost]
+    public ActionResult Editar(EditarAlunoViewModel editarVm)
+    {
+        if (!ModelState.IsValid)
+            return View(editarVm);
+
+        EditarAlunoDto dto = mapeador.Map<EditarAlunoDto>(editarVm);
+
+        Result resultado = servicoAluno.Editar(dto);
+
+        if (resultado.IsFailed)
+        {
+            ModelState.AddModelError(resultado);
+            return View(editarVm);
+        }
+
+        return RedirectToAction(nameof(Listar));
+    }
+
+    [HttpGet]
+    public ActionResult Excluir(Guid id)
+    {
+        Result<DetalhesAlunoDto> resultado = servicoAluno.SelecionarPorId(id);
+
+        if (resultado.IsFailed)
+        {
+            TempData.AddErrorMessage(resultado);
+            return RedirectToAction(nameof(Listar));
+        }
+
+        ExcluirAlunoViewModel excluirVm = mapeador.Map<ExcluirAlunoViewModel>(resultado.Value);
+
+        return View(excluirVm);
+    }
+
+    [HttpPost]
+    public ActionResult Excluir(ExcluirAlunoViewModel excluirVm)
+    {
+        Result resultado = servicoAluno.Excluir(excluirVm.Id);
+
+        if (resultado.IsFailed)
+            TempData.AddErrorMessage(resultado);
+
+        return RedirectToAction(nameof(Listar));
+    }
+}
