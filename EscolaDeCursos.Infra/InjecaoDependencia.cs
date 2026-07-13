@@ -49,13 +49,13 @@ public static class InjecaoDependencia
             });
         });
 
-       // services.AddScoped<IRepositorioAluno, RepositorioAlunoEmOrm>();
-       // services.AddScoped<IRepositorioAula, RepositorioAulaEmOrm>();
-       services.AddScoped<IRepositorioCategoria, RepositorioCategoriaEmOrm>();
-      //  services.AddScoped<IRepositorioCurso, RepositorioCursoEmOrm>();
-       // services.AddScoped<IRepositorioInstrutor, RepositorioInstrutorEmOrm>();
-      //  services.AddScoped<IRepositorioMatricula, RepositorioMatriculaEmOrm>();
-      //  services.AddScoped<IRepositorioTurma, RepositorioTurmaEmOrm>();
+        // services.AddScoped<IRepositorioAluno, RepositorioAlunoEmOrm>();
+        // services.AddScoped<IRepositorioAula, RepositorioAulaEmOrm>();
+        services.AddScoped<IRepositorioCategoria, RepositorioCategoriaEmOrm>();
+        // services.AddScoped<IRepositorioCurso, RepositorioCursoEmOrm>();
+        // services.AddScoped<IRepositorioInstrutor, RepositorioInstrutorEmOrm>();
+        // services.AddScoped<IRepositorioMatricula, RepositorioMatriculaEmOrm>();
+        // services.AddScoped<IRepositorioTurma, RepositorioTurmaEmOrm>();
     }
 }
 
