@@ -129,7 +129,7 @@ public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurs
             .Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
-                Text = c.Titulo
+                Text = c.Nome
             })
             .ToList();
 
