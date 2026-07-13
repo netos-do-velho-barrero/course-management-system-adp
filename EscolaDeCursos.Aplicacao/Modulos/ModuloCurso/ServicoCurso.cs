@@ -64,7 +64,7 @@ public class ServicoCurso : ServicoBase<Curso>
     {
         return repositorioCurso
             .SelecionarTodos()
-            .Select(c => new ListarCursoDto(c.Id, c.Titulo, c.Descricao, c.Nivel))
+            .Select(c => new ListarCursoDto(c.Id, c.Nome, c.Descricao, c.Nivel))
             .ToList();
     }
 
@@ -77,7 +77,7 @@ public class ServicoCurso : ServicoBase<Curso>
 
         return Result.Ok(new DetalhesCursoDto(
             curso.Id,
-            curso.Titulo,
+            curso.Nome,
             curso.Descricao,
             curso.CargaHoraria,
             curso.Nivel,
