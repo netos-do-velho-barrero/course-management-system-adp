@@ -1,22 +1,22 @@
 using eAgenda.WebApp.Modulos.ModuloCategoria.Infra;
 using EscolaDeCursos.Dominio.Modulos.ModuloAluno;
-using EscolaDeCursos.Dominio.Modulos.ModuloAula;
 using EscolaDeCursos.Dominio.Modulos.ModuloCategoria;
 using EscolaDeCursos.Dominio.Modulos.ModuloCurso;
-using EscolaDeCursos.Dominio.Modulos.ModuloInstrutor;
-using EscolaDeCursos.Dominio.Modulos.ModuloMatricula;
 using EscolaDeCursos.Dominio.Modulos.ModuloTurma;
 using EscolaDeCursos.Infra.Comartilhado.Logging;
 using EscolaDeCursos.Infra.Compartilhado.Orm;
 using EscolaDeCursos.Infra.Modulos.ModuloAluno;
 using EscolaDeCursos.Infra.Orm.Modulos.ModuloInstrutor;
 using EscolaDeCursos.Infra.Orm.Modulos.ModuloMatricula;
+using EscolaDeCursos.Infra.Modulos.ModuloCurso;
 using EscolaDeCursos.Infra.Orm.Modulos.ModuloTurma;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using EscolaDeCursos.Dominio.Modulos.ModuloInstrutor;
+using EscolaDeCursos.Dominio.Modulos.ModuloMatricula;
 
 namespace EscolaDeCursos.Infra;
 
@@ -53,12 +53,12 @@ public static class InjecaoDependencia
             });
         });
 
-       services.AddScoped<IRepositorioAluno, RepositorioAlunoEmOrm>();
+        services.AddScoped<IRepositorioAluno, RepositorioAlunoEmOrm>();
         services.AddScoped<IRepositorioCategoria, RepositorioCategoriaEmOrm>();
        // services.AddScoped<IRepositorioAula, RepositorioAulaEmOrm>();
-      //  services.AddScoped<IRepositorioCurso, RepositorioCursoEmOrm>();
         services.AddScoped<IRepositorioInstrutor, RepositorioInstrutorEmOrm>();
         services.AddScoped<IRepositorioMatricula, RepositorioMatriculaEmOrm>();
+         services.AddScoped<IRepositorioCurso, RepositorioCursoEmOrm>();
         services.AddScoped<IRepositorioTurma, RepositorioTurmaEmOrm>();
     }
 }

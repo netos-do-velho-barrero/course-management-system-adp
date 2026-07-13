@@ -1,10 +1,13 @@
 using EscolaDeCursos.Dominio.Compartilhado;
+using EscolaDeCursos.Dominio.Modulos.ModuloCurso;
 
 namespace EscolaDeCursos.Dominio.Modulos.ModuloCategoria;
 
 public class Categoria : EntidadeBase<Categoria>
 {
     public string Nome { get; set; } = string.Empty;
+
+    public ICollection<Curso> Cursos { get; set; } = [];
 
     public Categoria() { }
 

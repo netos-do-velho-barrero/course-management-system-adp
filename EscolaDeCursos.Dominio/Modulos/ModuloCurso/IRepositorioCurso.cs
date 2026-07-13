@@ -4,5 +4,5 @@ namespace EscolaDeCursos.Dominio.Modulos.ModuloCurso;
 
 public interface IRepositorioCurso : IRepositorio<Curso>
 {
-    bool ExisteTitulo(string titulo, Guid? idIgnorado = null);
+    bool ExisteNome(string titulo, Guid? idIgnorado = null);
 }

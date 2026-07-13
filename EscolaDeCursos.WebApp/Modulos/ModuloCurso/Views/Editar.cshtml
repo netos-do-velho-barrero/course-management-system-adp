@@ -1,0 +1,105 @@
+@{
+    Layout = "_Layout";
+    ViewBag.Titulo = "Edição de Curso";
+}
+
+@model EditarCursoViewModel;
+
+<form class="card border-primary-subtle shadow-sm mx-auto p-4" style="max-width: 620px;" asp-action="Editar"
+      asp-route-id="@Model.Id" method="post">
+
+    <input asp-for="Id" type="hidden">
+
+
+    <div class="mb-3">
+        <label asp-for="Nome" class="form-label fw-semibold text-primary text-uppercase small">
+            Nome
+        </label>
+
+        <input asp-for="Nome" class="form-control">
+
+        <span asp-validation-for="Nome" class="text-danger small fw-semibold"></span>
+    </div>
+
+
+    <div class="mb-3">
+        <label asp-for="Descricao" class="form-label fw-semibold text-primary text-uppercase small">
+            Descrição
+        </label>
+
+        <textarea asp-for="Descricao" class="form-control"></textarea>
+
+        <span asp-validation-for="Descricao" class="text-danger small fw-semibold"></span>
+    </div>
+
+
+    <div class="mb-3">
+        <label asp-for="CargaHoraria" class="form-label fw-semibold text-primary text-uppercase small">
+            Carga Horária
+        </label>
+
+        <input asp-for="CargaHoraria" type="number" class="form-control">
+
+        <span asp-validation-for="CargaHoraria" class="text-danger small fw-semibold"></span>
+    </div>
+
+
+    <div class="mb-3">
+        <label asp-for="Nivel" class="form-label fw-semibold text-primary text-uppercase small">
+            Nível
+        </label>
+
+        <select asp-for="Nivel" class="form-select">
+
+            <option value="-1">
+                Selecione
+            </option>
+
+            <option value="0">
+                Básico
+            </option>
+
+            <option value="1">
+                Intermediário
+            </option>
+
+            <option value="2">
+                Avançado
+            </option>
+
+        </select>
+
+        <span asp-validation-for="Nivel" class="text-danger small fw-semibold"></span>
+    </div>
+
+
+    <div class="mb-3">
+        <label asp-for="CategoriaId" class="form-label fw-semibold text-primary text-uppercase small">
+            Categoria
+        </label>
+
+        <select asp-for="CategoriaId" asp-items="Model.Categorias" class="form-select">
+
+            <option value="">
+                Selecione
+            </option>
+
+        </select>
+
+        <span asp-validation-for="CategoriaId" class="text-danger small fw-semibold"></span>
+    </div>
+
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+
+        <a class="btn btn-outline-primary rounded-pill px-4" asp-action="Listar">
+            Voltar
+        </a>
+
+        <button class="btn btn-primary rounded-pill px-4" type="submit">
+            Confirmar
+        </button>
+
+    </div>
+
+</form>
