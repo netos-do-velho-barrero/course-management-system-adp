@@ -30,7 +30,7 @@ public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mape
     public ActionResult Cadastrar(CadastrarCategoriaViewModel cadastrarVm)
     {
         if (!ModelState.IsValid)
-            return View(cadastrarVm);
+            return RedirectToAction(nameof(Listar));
 
         CadastrarCategoriaDto dto = mapeador.Map<CadastrarCategoriaDto>(cadastrarVm);
 
@@ -38,9 +38,8 @@ public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mape
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-
-            return View(cadastrarVm);
+            TempData.AddErrorMessage(resultado);
+            return RedirectToAction(nameof(Listar));
         }
 
         return RedirectToAction(nameof(Listar));
@@ -54,7 +53,6 @@ public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mape
         if (resultado.IsFailed)
         {
             TempData.AddErrorMessage(resultado);
-
             return RedirectToAction(nameof(Listar));
         }
 
@@ -67,7 +65,7 @@ public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mape
     public ActionResult Editar(EditarCategoriaViewModel editarVm)
     {
         if (!ModelState.IsValid)
-            return View(editarVm);
+            return RedirectToAction(nameof(Listar));
 
         EditarCategoriaDto dto = mapeador.Map<EditarCategoriaDto>(editarVm);
 
@@ -75,9 +73,8 @@ public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mape
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-
-            return View(editarVm);
+            TempData.AddErrorMessage(resultado);
+            return RedirectToAction(nameof(Listar));
         }
 
         return RedirectToAction(nameof(Listar));
@@ -91,7 +88,6 @@ public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mape
         if (resultado.IsFailed)
         {
             TempData.AddErrorMessage(resultado);
-
             return RedirectToAction(nameof(Listar));
         }
 
@@ -103,10 +99,21 @@ public class CategoriaController(ServicoCategoria servicoCategoria, IMapper mape
     [HttpPost]
     public ActionResult Excluir(ExcluirCategoriaViewModel excluirVm)
     {
-        Result resultado = servicoCategoria.Excluir(excluirVm.Id);
+        try
+        {
+            Result resultado = servicoCategoria.Excluir(excluirVm.Id);
 
-        if (resultado.IsFailed)
-            TempData.AddErrorMessage(resultado);
+            if (resultado.IsFailed)
+            {
+                TempData.AddErrorMessage(resultado);
+                return RedirectToAction(nameof(Listar));
+            }
+        }
+        catch (Exception)
+        {
+            // Captura o erro caso a validação passe mas o banco barre por causa dos Cursos vinculados
+            TempData["MensagemErro"] = "Não é possível excluir esta categoria pois existem cursos associados a ela.";
+        }
 
         return RedirectToAction(nameof(Listar));
     }

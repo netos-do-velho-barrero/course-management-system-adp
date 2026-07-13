@@ -1,52 +1,164 @@
+@model List<EscolaDeCursos.WebApp.Modulos.ModuloCategoria.ListarCategoriasViewModel>
+
 @{
     Layout = "_Layout";
-    ViewBag.Titulo = "Listagem de Categorias";
+    ViewBag.Titulo = "Categorias";
 }
 
-@model List<ListarCategoriasViewModel>;
-
-<a class="btn btn-outline-primary rounded-pill px-4 mb-3" asp-action="Cadastrar">Cadastrar Nova</a>
-
-@if (TempData["MensagemErro"] is string mensagemErro)
+@if (TempData["MensagemErro"] != null || TempData["Erro"] != null)
 {
-    <div class="alert alert-danger border-start border-danger border-4 rounded-3" role="alert">
-        @mensagemErro
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+         style="border-radius: 8px;">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <div>
+                <strong>Ops!</strong> @(TempData["MensagemErro"] ?? TempData["Erro"])
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-@if (Model.Count == 0)
-{
-    <div class="alert alert-primary border-start border-primary border-4 rounded-3" role="alert">
-        Nenhuma categoria cadastrada.
+<div class="container-fluid p-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold h3 text-dark mb-1">Categorias</h1>
+            <p class="text-secondary mb-0 small">Listagem de categorias do sistema</p>
+        </div>
+        <button class="btn btn-primary px-4 fw-semibold d-flex align-items-center gap-2"
+                style="background-color: #1a56db; border: none; border-radius: 8px; padding: 10px 20px;"
+                data-bs-toggle="modal" data-bs-target="#modalCategoria" onclick="configurarModalCadastro()">
+            <i class="bi bi-plus-lg"></i> Nova Categoria
+        </button>
     </div>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-2">
-        @foreach (ListarCategoriasViewModel c in Model)
-        {
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-                            <h5 class="card-title mb-0">@c.Nome</h5>
-                            <span class="badge text-bg-primary rounded-pill">@c.Id.ToString().Substring(0, 8)</span>
-                        </div>
 
-                        <dl class="row g-2 mb-4">
-                            <dt class="col-5 text-secondary fw-semibold">ID</dt>
-                            <dd class="col-7 mb-0 text-break">@c.Id</dd>
-                        </dl>
+    <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="background-color: #ffffff;">
+                <thead class="table-light text-uppercase small text-secondary"
+                       style="font-size: 0.75rem; letter-spacing: 0.5px; background-color: #f8fafc;">
+                    <tr>
+                        <th class="ps-4 py-3" style="width: 75%;">Nome da Categoria</th>
+                        <th class="text-end pe-4 py-3" style="width: 25%;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="text-dark" style="font-size: 0.95rem;">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var categoria in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold text-dark">@categoria.Nome</td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-sm px-3 py-2 d-inline-flex align-items-center gap-2 fw-medium"
+                                                style="background-color: #eff6ff; color: #1a56db; border: 1px solid #bfdbfe; border-radius: 8px;"
+                                                data-bs-toggle="modal" data-bs-target="#modalCategoria"
+                                                onclick="configurarModalEdicao('@categoria.Id', '@categoria.Nome')">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
 
-                        <div class="d-flex flex-wrap gap-2 mt-auto justify-content-end">
-                            <a class="btn btn-outline-primary btn-sm rounded-pill px-3" asp-action="Editar"
-                               asp-route-id="@c.Id">Editar</a>
-                            <a class="btn btn-outline-primary btn-sm rounded-pill px-3" asp-action="Excluir"
-                               asp-route-id="@c.Id">Excluir</a>
+                                        <button class="btn btn-sm px-3 py-2 d-inline-flex align-items-center gap-2 fw-medium"
+                                                style="background-color: #fef2f2; color: #dc3545; border: 1px solid #fecaca; border-radius: 8px;"
+                                                data-bs-toggle="modal" data-bs-target="#modalExcluir"
+                                                onclick="configurarModalExclusao('@categoria.Id', '@categoria.Nome')">
+                                            <i class="bi bi-trash3"></i> Excluir
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="2" class="text-center py-5 text-secondary">
+                                <i class="bi bi-folder-x fs-2 d-block mb-2 text-muted"></i>
+                                Nenhuma categoria cadastrada até o momento.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCategoria" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+            <div class="modal-header border-0 pt-4 px-4 pb-2">
+                <h5 class="modal-title fw-bold text-dark fs-5" id="modalCategoriaTitulo">Nova Categoria</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formCategoria" method="post">
+                <input type="hidden" id="categoriaId" name="Id" />
+                <div class="modal-body px-4 py-2">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark mb-1">Título da Categoria <span
+                            class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="inputNome" name="Nome"
+                                   placeholder="Ex: Desenvolvimento Web" required
+                                   style="border-radius: 8px; padding: 10px; border: 1px solid #cbd5e1;">
                         </div>
                     </div>
+                    <div class="modal-footer border-0 d-flex justify-content-end gap-2 pb-4 px-4 pt-2">
+                        <button type="button" class="btn btn-light px-4 fw-medium text-secondary" data-bs-dismiss="modal"
+                                style="border-radius: 8px; border: 1px solid #e2e8f0;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold"
+                                style="background-color: #1a56db; border: none; border-radius: 8px;">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalExcluir" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+            <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+                <form id="formExcluir" method="post" asp-action="Excluir">
+                    <input type="hidden" id="excluirId" name="Id" />
+                    <div class="modal-body text-center p-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle rounded-circle mb-3"
+                             style="width: 56px; height: 56px;">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2 fs-5">Excluir Categoria</h5>
+                        <p class="text-secondary small px-3 mb-4">
+                            Tem certeza que deseja remover a categoria "<span id="excluirNomeLabel"
+                                                                              class="fw-bold text-dark"></span>"? Todos os vínculos associados poderão ser afetados.
+                        </p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-light px-4 fw-medium text-secondary"
+                                    data-bs-dismiss="modal"
+                                    style="border-radius: 8px; border: 1px solid #e2e8f0;">Cancelar</button>
+                            <button type="submit" class="btn btn-danger px-4 fw-semibold"
+                                    style="border-radius: 8px; background-color: #dc3545; border: none;">Confirmar
+                                Exclusão</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        }
-    </div>
-}
+        </div>
+
+        <script>
+            function configurarModalCadastro() {
+                document.getElementById('modalCategoriaTitulo').innerText = 'Nova Categoria';
+                document.getElementById('formCategoria').action = '@Url.Action("Cadastrar", "Categoria")';
+                document.getElementById('categoriaId').value = '';
+                document.getElementById('inputNome').value = '';
+            }
+
+            function configurarModalEdicao(id, nome) {
+                document.getElementById('modalCategoriaTitulo').innerText = 'Editar Categoria';
+                document.getElementById('formCategoria').action = '@Url.Action("Editar", "Categoria")';
+                document.getElementById('categoriaId').value = id;
+                document.getElementById('inputNome').value = nome;
+            }
+
+            function configurarModalExclusao(id, nome) {
+                document.getElementById('excluirId').value = id;
+                document.getElementById('excluirNomeLabel').innerText = nome;
+            }
+        </script>

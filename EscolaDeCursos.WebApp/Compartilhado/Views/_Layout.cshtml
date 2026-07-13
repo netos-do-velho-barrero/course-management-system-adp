@@ -1,63 +1,173 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Titulo - EduCore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 
-    @* Importação do CSS do Bootstrap *@
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+            :root {
+                --bg-light: #f8fafc;
+                --bg-sidebar: #0f1c3f;
+                --blue-main: #1a56db;
+                --text-dark: #1e293b;
+                --border-color: #e2e8f0;
+            }
 
-    <title>@ViewBag.Titulo - Escola de Cursos</title>
+            body {
+                background-color: var(--bg-light);
+                color: var(--text-dark);
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            .sidebar {
+                background-color: var(--bg-sidebar);
+                width: 260px;
+                min-height: 100vh;
+                border-right: 1px solid var(--border-color);
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 1000;
+            }
+
+            .main-content {
+                margin-left: 260px;
+                padding: 30px;
+                min-height: 100vh;
+            }
+
+            .nav-link-custom {
+                color: #94a3b8;
+                padding: 12px 20px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                text-decoration: none;
+                border-radius: 8px;
+                margin: 4px 15px;
+                font-size: 0.95rem;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+
+            .nav-link-custom:hover {
+                color: #ffffff;
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+
+            .nav-link-custom.active-link {
+                color: #ffffff;
+                background-color: var(--blue-main);
+            }
+
+            .top-navbar {
+                height: 70px;
+                border-bottom: 1px solid var(--border-color);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 30px;
+                margin-bottom: 30px;
+                background-color: #ffffff;
+                border-radius: 12px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            }
+    </style>
 </head>
 
 <body>
 
-    @* Barra de Navegação *@
-    <nav class="navbar navbar-expand-lg bg-white border-bottom">
-        <div class="container">
+    @{
+        var controllerAtual = ViewContext.RouteData.Values["controller"]?.ToString();
+        var actionAtual = ViewContext.RouteData.Values["action"]?.ToString();
+    }
 
-            <a class="navbar-brand fw-semibold" asp-controller="Home" asp-action="Index">
-                Escola de Cursos
-            </a>
+    <div class="sidebar d-flex flex-column justify-content-between pb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 p-4 mb-2">
+                <i class="bi bi-mortarboard-fill fs-3 text-white"></i>
+                <span class="fw-bold fs-4 text-white">EduCore</span>
+            </div>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
-                    aria-controls="menuPrincipal" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <div class="nav flex-column">
+                <a class="nav-link-custom @(controllerAtual == "Home" && actionAtual == "Dashboard" ? "active-link" : "")"
+                   asp-controller="Home" asp-action="Dashboard">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
 
-            <div class="collapse navbar-collapse" id="menuPrincipal">
-                <div class="navbar-nav ms-auto">
-                    <a class="nav-link" asp-controller="Home" asp-action="Index">Início</a>
-                    <a class="nav-link" asp-controller="Aluno" asp-action="Listar">Alunos</a>
-                    <a class="nav-link" asp-controller="Curso" asp-action="Listar">Cursos</a>
-                    <a class="nav-link" asp-controller="Aula" asp-action="Listar">Aulas</a>
-                    <a class="nav-link" asp-controller="Turma" asp-action="Listar">Turmas</a>
-                    <a class="nav-link" asp-controller="Instrutor" asp-action="Listar">Instrutores</a>
-                    <a class="nav-link" asp-controller="Matricula" asp-action="Listar">Matrículas</a>
-                    <a class="nav-link" asp-controller="Categoria" asp-action="Listar">Categorias</a>
+                <div class="text-uppercase text-white opacity-50 px-4 pt-3 pb-2 fw-bold"
+                     style="font-size: 0.75rem; letter-spacing: 0.5px;">Gestão Acadêmica</div>
+
+                <a class="nav-link-custom @(controllerAtual == "Categoria" ? "active-link" : "")"
+                   asp-controller="Categoria" asp-action="Listar">
+                    <i class="bi bi-tags"></i> Categorias
+                </a>
+
+                <a class="nav-link-custom @(controllerAtual == "Curso" ? "active-link" : "")" asp-controller="Curso"
+                   asp-action="Listar">
+                    <i class="bi bi-journal-bookmark"></i> Cursos
+                </a>
+
+                <a class="nav-link-custom @(controllerAtual == "Aula" ? "active-link" : "")" asp-controller="Aula"
+                   asp-action="Listar">
+                    <i class="bi bi-play-btn"></i> Aulas
+                </a>
+
+                <a class="nav-link-custom @(controllerAtual == "Instrutor" ? "active-link" : "")"
+                   asp-controller="Instrutor" asp-action="Listar">
+                    <i class="bi bi-person-workspace"></i> Instrutores
+                </a>
+
+                <a class="nav-link-custom @(controllerAtual == "Aluno" ? "active-link" : "")" asp-controller="Aluno"
+                   asp-action="Listar">
+                    <i class="bi bi-people"></i> Alunos
+                </a>
+
+                <a class="nav-link-custom @(controllerAtual == "Turma" ? "active-link" : "")" asp-controller="Turma"
+                   asp-action="Listar">
+                    <i class="bi bi-calendar3"></i> Turmas
+                </a>
+
+                <a class="nav-link-custom @(controllerAtual == "Matricula" ? "active-link" : "")"
+                   asp-controller="Matricula" asp-action="Listar">
+                    <i class="bi bi-card-checklist"></i> Matrículas
+                </a>
+            </div>
+        </div>
+
+        <div class="nav flex-column">
+            <a class="nav-link-custom" href="#"><i class="bi bi-gear"></i> Configurações</a>
+            <a class="nav-link-custom text-danger" asp-controller="Home" asp-action="Login"><i
+                class="bi bi-box-arrow-left"></i> Sair</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-navbar">
+                <div class="d-flex align-items-center">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 small">
+                            <li class="breadcrumb-item text-secondary">EduCore</li>
+                            <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">@ViewBag.Titulo</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-white d-flex align-items-center justify-content-center rounded-circle fw-bold"
+                         style="width: 38px; height: 38px; background-color: var(--blue-main);">AD</div>
+                    <div class="small fw-bold text-dark">Administrador</div>
                 </div>
             </div>
 
+            @RenderBody()
         </div>
-    </nav>
 
-    @* Cabeçalho da Página *@
-    <header class="container py-4">
-        <h2>@ViewBag.Titulo</h2>
-    </header>
-
-    @* Conteúdo da Página *@
-    <main class="container pb-5">
-        @RenderBody()
-    </main>
-
-    @* Importação do JavaScript do Bootstrap *@
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-            crossorigin="anonymous"></script>
-
-</body>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
 
 </html>
