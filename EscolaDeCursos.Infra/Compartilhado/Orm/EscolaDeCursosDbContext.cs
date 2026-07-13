@@ -19,7 +19,7 @@ public sealed class EscolaDeCursosDbContext(
     // public DbSet<Aula> Aulas => Set<Aula>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
     // public DbSet<Curso> Cursos => Set<Curso>();
-    // public DbSet<Instrutor> Instrutores => Set<Instrutor>();
+     public DbSet<Instrutor> Instrutores => Set<Instrutor>();
     // public DbSet<Matricula> Matriculas => Set<Matricula>();
     public DbSet<Turma> Turmas => Set<Turma>();
 

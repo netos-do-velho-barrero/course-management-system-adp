@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using EscolaDeCursos.Aplicacao.Modulos.ModuloTurma;
 using EscolaDeCursos.WebApp.Compartilhado.Extensions;
+using EscolaDeCursos.Aplicacao.Modulos.ModuloCurso;
+using EscolaDeCursos.Aplicacao.Modulos.ModuloInstrutor;
 
 namespace EscolaDeCursos.WebApp.Modulos.ModuloTurma;
 
-public class TurmaController(ServicoTurma servicoTurma, IMapper mapeador) : Controller
+public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurso,
+    ServicoInstrutor servicoInstrutor, IMapper mapeador) : Controller
 {
     [HttpGet]
     public ActionResult Listar()
@@ -120,13 +123,26 @@ public class TurmaController(ServicoTurma servicoTurma, IMapper mapeador) : Cont
         return RedirectToAction(nameof(Listar));
     }
 
-    private void CarregarComponentesSelecao()
+       private void CarregarComponentesSelecao()
     {
+        List<SelectListItem> cursos = servicoCurso.SelecionarTodos()
+            .Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Titulo
+            })
+            .ToList();
 
-        var cursos = new List<SelectListItem>();
-        var instrutores = new List<SelectListItem>();
+        List<SelectListItem> instrutores = servicoInstrutor.SelecionarTodos()
+            .Select(i => new SelectListItem
+            {
+                Value = i.Id.ToString(),
+                Text = i.Nome
+            })
+            .ToList();
 
         ViewBag.Cursos = cursos;
         ViewBag.Instrutores = instrutores;
     }
 }
+
