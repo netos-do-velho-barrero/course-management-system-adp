@@ -1,12 +1,18 @@
 using AutoMapper;
 using FluentResults;
+using EscolaDeCursos.Aplicacao.Modulos.ModuloCategoria;
+using EscolaDeCursos.Aplicacao.Modulos.ModuloCurso;
 using EscolaDeCursos.WebApp.Compartilhado.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using EscolaDeCursos.Aplicacao.Modulos.ModuloCurso;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using EscolaDeCursos.Dominio.Modulos.ModuloCurso;
 
 namespace EscolaDeCursos.WebApp.Modulos.ModuloCurso;
 
-public class CursoController(ServicoCurso servicoCurso, IMapper mapeador) : Controller
+public class CursoController(
+    ServicoCurso servicoCurso,
+    ServicoCategoria servicoCategoria,
+    IMapper mapeador) : Controller
 {
     [HttpGet]
     public ActionResult Listar()
@@ -25,8 +31,9 @@ public class CursoController(ServicoCurso servicoCurso, IMapper mapeador) : Cont
             string.Empty,
             string.Empty,
             0,
-            default,
-            Guid.Empty
+            (NivelCurso)(-1),
+            null, // Alterado de Guid.Empty para null para coincidir com o Guid?
+            CarregarCategorias()
         );
 
         return View(cadastrarVm);
@@ -36,7 +43,14 @@ public class CursoController(ServicoCurso servicoCurso, IMapper mapeador) : Cont
     public ActionResult Cadastrar(CadastrarCursoViewModel cadastrarVm)
     {
         if (!ModelState.IsValid)
+        {
+            cadastrarVm = cadastrarVm with
+            {
+                Categorias = CarregarCategorias()
+            };
+
             return View(cadastrarVm);
+        }
 
         CadastrarCursoDto dto = mapeador.Map<CadastrarCursoDto>(cadastrarVm);
 
@@ -45,6 +59,11 @@ public class CursoController(ServicoCurso servicoCurso, IMapper mapeador) : Cont
         if (resultado.IsFailed)
         {
             ModelState.AddModelError(resultado);
+
+            cadastrarVm = cadastrarVm with
+            {
+                Categorias = CarregarCategorias()
+            };
 
             return View(cadastrarVm);
         }
@@ -66,6 +85,11 @@ public class CursoController(ServicoCurso servicoCurso, IMapper mapeador) : Cont
 
         EditarCursoViewModel editarVm = mapeador.Map<EditarCursoViewModel>(resultado.Value);
 
+        editarVm = editarVm with
+        {
+            Categorias = CarregarCategorias()
+        };
+
         return View(editarVm);
     }
 
@@ -73,7 +97,14 @@ public class CursoController(ServicoCurso servicoCurso, IMapper mapeador) : Cont
     public ActionResult Editar(EditarCursoViewModel editarVm)
     {
         if (!ModelState.IsValid)
+        {
+            editarVm = editarVm with
+            {
+                Categorias = CarregarCategorias()
+            };
+
             return View(editarVm);
+        }
 
         EditarCursoDto dto = mapeador.Map<EditarCursoDto>(editarVm);
 
@@ -82,6 +113,11 @@ public class CursoController(ServicoCurso servicoCurso, IMapper mapeador) : Cont
         if (resultado.IsFailed)
         {
             ModelState.AddModelError(resultado);
+
+            editarVm = editarVm with
+            {
+                Categorias = CarregarCategorias()
+            };
 
             return View(editarVm);
         }
@@ -115,5 +151,18 @@ public class CursoController(ServicoCurso servicoCurso, IMapper mapeador) : Cont
             TempData.AddErrorMessage(resultado);
 
         return RedirectToAction(nameof(Listar));
+    }
+
+
+    private List<SelectListItem> CarregarCategorias()
+    {
+        return servicoCategoria
+            .SelecionarTodos()
+            .Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Nome
+            })
+            .ToList();
     }
 }

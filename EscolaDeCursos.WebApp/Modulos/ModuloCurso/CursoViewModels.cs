@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using EscolaDeCursos.Dominio.Modulos.ModuloCurso;
 
 namespace EscolaDeCursos.WebApp.Modulos.ModuloCurso;
@@ -13,43 +14,47 @@ public record ListarCursosViewModel(
 );
 
 public record CadastrarCursoViewModel(
-    [Required(ErrorMessage = "O campo \"Nome\" deve ser preenchido.")]
-    [StringLength(100, MinimumLength = 3, ErrorMessage = "O campo \"Nome\" deve conter entre 3 e 100 caracteres.")]
+    [Required(ErrorMessage = "O campo Nome deve ser preenchido.")]
+    [StringLength(100, MinimumLength = 3)]
     string Nome,
 
-    [Required(ErrorMessage = "O campo \"Descrição\" deve ser preenchido.")]
+    [Required(ErrorMessage = "O campo Descrição deve ser preenchido.")]
     string Descricao,
 
-    [Required(ErrorMessage = "O campo \"Carga Horária\" deve ser preenchido.")]
     [Range(1, int.MaxValue, ErrorMessage = "A carga horária deve ser maior que zero.")]
     int CargaHoraria,
 
-    [Required(ErrorMessage = "O campo \"Nível\" deve ser preenchido.")]
+    [Range(0, 2, ErrorMessage = "Selecione um nível válido.")]
     NivelCurso Nivel,
 
     [Required(ErrorMessage = "A categoria deve ser selecionada.")]
-    Guid CategoriaId
+    Guid? CategoriaId,
+
+    // Alterado para ? e inicializado com Enumerable.Empty para o validador ignorar no POST
+    IEnumerable<SelectListItem>? Categorias = null
 );
 
 public record EditarCursoViewModel(
     Guid Id,
 
-    [Required(ErrorMessage = "O campo \"Nome\" deve ser preenchido.")]
-    [StringLength(100, MinimumLength = 3, ErrorMessage = "O campo \"Nome\" deve conter entre 3 e 100 caracteres.")]
+    [Required(ErrorMessage = "O campo Nome deve ser preenchido.")]
+    [StringLength(100, MinimumLength = 3)]
     string Nome,
 
-    [Required(ErrorMessage = "O campo \"Descrição\" deve ser preenchido.")]
+    [Required(ErrorMessage = "O campo Descrição deve ser preenchido.")]
     string Descricao,
 
-    [Required(ErrorMessage = "O campo \"Carga Horária\" deve ser preenchido.")]
     [Range(1, int.MaxValue, ErrorMessage = "A carga horária deve ser maior que zero.")]
     int CargaHoraria,
 
-    [Required(ErrorMessage = "O campo \"Nível\" deve ser preenchido.")]
+    [Range(0, 2, ErrorMessage = "Selecione um nível válido.")]
     NivelCurso Nivel,
 
     [Required(ErrorMessage = "A categoria deve ser selecionada.")]
-    Guid CategoriaId
+    Guid? CategoriaId,
+
+    // Alterado para ? e inicializado com Enumerable.Empty para o validador ignorar no POST
+    IEnumerable<SelectListItem>? Categorias = null
 );
 
 public record ExcluirCursoViewModel(

@@ -23,7 +23,7 @@ public class CursoProfile : Profile
                 src.Descricao,
                 src.CargaHoraria,
                 src.Nivel,
-                src.CategoriaId
+                src.CategoriaId ?? Guid.Empty
             ));
 
         CreateMap<EditarCursoViewModel, EditarCursoDto>()
@@ -33,7 +33,7 @@ public class CursoProfile : Profile
                 src.Descricao,
                 src.CargaHoraria,
                 src.Nivel,
-                src.CategoriaId
+                src.CategoriaId ?? Guid.Empty
             ));
 
         CreateMap<DetalhesCursoDto, EditarCursoViewModel>()
@@ -43,7 +43,8 @@ public class CursoProfile : Profile
                 src.Descricao,
                 src.CargaHoraria,
                 src.Nivel,
-                src.CategoriaId
+                src.CategoriaId,
+                Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>()
             ));
 
         CreateMap<DetalhesCursoDto, ExcluirCursoViewModel>()

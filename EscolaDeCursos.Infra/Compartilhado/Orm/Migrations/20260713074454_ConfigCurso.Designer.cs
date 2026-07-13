@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EscolaDeCursos.Infra.Compartilhado.Orm.Migrations
 {
     [DbContext(typeof(EscolaDeCursosDbContext))]
-    [Migration("20260713063853_ConfigCurso")]
+    [Migration("20260713074454_ConfigCurso")]
     partial class ConfigCurso
     {
         /// <inheritdoc />

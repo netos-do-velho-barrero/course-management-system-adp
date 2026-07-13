@@ -15,7 +15,12 @@ public class Curso : EntidadeBase<Curso>
 
     public Curso() { }
 
-    public Curso(string nome, string descricao, int cargaHoraria, NivelCurso nivel, Guid categoriaId)
+    public Curso(
+        string nome,
+        string descricao,
+        int cargaHoraria,
+        NivelCurso nivel,
+        Guid categoriaId)
     {
         Nome = nome;
         Descricao = descricao;
@@ -35,10 +40,10 @@ public class Curso : EntidadeBase<Curso>
             erros.Add("O campo 'Descrição' é obrigatório.");
 
         if (CargaHoraria <= 0)
-            erros.Add("A Carga Horária deve ser maior que zero.");
+            erros.Add("A carga horária deve ser maior que zero.");
 
         if (CategoriaId == Guid.Empty)
-            erros.Add("O curso deve estar obrigatoriamente vinculado a uma categoria.");
+            erros.Add("O curso deve estar vinculado a uma categoria.");
 
         return erros;
     }

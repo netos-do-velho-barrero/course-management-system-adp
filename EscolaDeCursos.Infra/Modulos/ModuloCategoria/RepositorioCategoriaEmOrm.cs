@@ -1,17 +1,17 @@
-using EscolaDeCursos.Dominio.Modulos.ModuloCurso;
+using EscolaDeCursos.Dominio.Modulos.ModuloCategoria;
 using EscolaDeCursos.Infra.Compartilhado.Orm;
 using EscolaDeCursos.WebApp.Compartilhado.Infra.Orm;
 
-namespace eAgenda.WebApp.Modulos.ModuloCurso.Infra;
+namespace eAgenda.WebApp.Modulos.ModuloCategoria.Infra;
 
-public sealed class RepositorioCursoEmOrm(EscolaDeCursosDbContext dbContext) :
-    RepositorioBaseEmOrm<Curso>(dbContext), IRepositorioCurso
+public sealed class RepositorioCategoriaEmOrm(EscolaDeCursosDbContext dbContext) :
+    RepositorioBaseEmOrm<Categoria>(dbContext), IRepositorioCategoria
 {
-    public bool ExisteTitulo(string titulo, Guid? idIgnorado = null)
+    public bool ExisteNome(string nome, Guid? idIgnorado = null)
     {
         return registros.Any(x =>
-            x.Nome == titulo &&
-            (!idIgnorado.HasValue || x.Id != idIgnorado.Value)
+         x.Nome == nome &&
+         (!idIgnorado.HasValue || x.Id != idIgnorado.Value)
         );
     }
 }

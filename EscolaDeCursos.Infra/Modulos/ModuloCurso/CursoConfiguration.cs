@@ -2,7 +2,7 @@ using EscolaDeCursos.Dominio.Modulos.ModuloCurso;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace eAgenda.WebApp.Compartilhado.Infra.Orm.Config;
+namespace EscolaDeCursos.Infra.Compartilhado.Orm.Config;
 
 public sealed class CursoConfiguration : IEntityTypeConfiguration<Curso>
 {

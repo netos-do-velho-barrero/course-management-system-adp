@@ -16,5 +16,5 @@ var app = builder.Build();
 app.UseRouting();
 app.MapDefaultControllerRoute();
 
-// Execução do Servidor
 app.Run();
+// Execução do Servidor

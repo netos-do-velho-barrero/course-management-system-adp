@@ -15,10 +15,10 @@ public class ServicoCurso : ServicoBase<Curso>
 
     public Result Cadastrar(CadastrarCursoDto dto)
     {
-        if (repositorioCurso.ExisteTitulo(dto.Titulo))
-            return Falha(nameof(dto.Titulo), "Já existe um curso cadastrado com este título.");
+        if (repositorioCurso.ExisteNome(dto.Nome))
+            return Falha(nameof(dto.Nome), "Já existe um curso cadastrado com este título.");
 
-        Curso curso = new Curso(dto.Titulo, dto.Descricao, dto.CargaHoraria, dto.Nivel, dto.CategoriaId);
+        Curso curso = new Curso(dto.Nome, dto.Descricao, dto.CargaHoraria, dto.Nivel, dto.CategoriaId);
 
         Result resultadoValidacao = ValidarEntidade(curso);
 
@@ -32,10 +32,18 @@ public class ServicoCurso : ServicoBase<Curso>
 
     public Result Editar(EditarCursoDto dto)
     {
-        if (repositorioCurso.ExisteTitulo(dto.Titulo, dto.Id))
-            return Falha(nameof(dto.Titulo), "Já existe um curso cadastrado com este título.");
+        if (repositorioCurso.ExisteNome(dto.Nome, dto.Id))
+            return Falha(nameof(dto.Nome), "Já existe um curso cadastrado com este nome.");
 
-        Curso curso = new Curso(dto.Titulo, dto.Descricao, dto.CargaHoraria, dto.Nivel, dto.CategoriaId);
+        Curso curso = new Curso(
+            dto.Nome,
+            dto.Descricao,
+            dto.CargaHoraria,
+            dto.Nivel,
+            dto.CategoriaId)
+        {
+            Id = dto.Id
+        };
 
         Result resultadoValidacao = ValidarEntidade(curso);
 
@@ -64,7 +72,14 @@ public class ServicoCurso : ServicoBase<Curso>
     {
         return repositorioCurso
             .SelecionarTodos()
-            .Select(c => new ListarCursoDto(c.Id, c.Nome, c.Descricao, c.Nivel))
+            .Select(c => new ListarCursoDto(
+    c.Id,
+    c.Nome,
+    c.Descricao,
+    c.CargaHoraria,
+    c.Nivel,
+    c.CategoriaId
+))
             .ToList();
     }
 
