@@ -19,17 +19,9 @@ public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurs
 
         List<ListarTurmaViewModel> listarVms = mapeador.Map<List<ListarTurmaViewModel>>(dtos);
 
-        return View(listarVms);
-    }
-
-    [HttpGet]
-    public ActionResult Cadastrar()
-    {
         CarregarComponentesSelecao();
 
-        CadastrarTurmaViewModel cadastrarVm = new CadastrarTurmaViewModel();
-
-        return View(cadastrarVm);
+        return View(listarVms);
     }
 
     [HttpPost]
@@ -37,8 +29,8 @@ public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurs
     {
         if (!ModelState.IsValid)
         {
-            CarregarComponentesSelecao();
-            return View(cadastrarVm);
+            TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
+            return RedirectToAction(nameof(Listar));
         }
 
         CadastrarTurmaDto dto = mapeador.Map<CadastrarTurmaDto>(cadastrarVm);
@@ -47,30 +39,11 @@ public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurs
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            CarregarComponentesSelecao();
-            return View(cadastrarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Editar(Guid id)
-    {
-        Result<DetalhesTurmaDto> resultado = servicoTurma.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
             TempData.AddErrorMessage(resultado);
             return RedirectToAction(nameof(Listar));
         }
 
-        CarregarComponentesSelecao();
-
-        EditarTurmaViewModel editarVm = mapeador.Map<EditarTurmaViewModel>(resultado.Value);
-
-        return View(editarVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
@@ -78,8 +51,8 @@ public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurs
     {
         if (!ModelState.IsValid)
         {
-            CarregarComponentesSelecao();
-            return View(editarVm);
+            TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
+            return RedirectToAction(nameof(Listar));
         }
 
         EditarTurmaDto dto = mapeador.Map<EditarTurmaDto>(editarVm);
@@ -88,34 +61,17 @@ public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurs
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            CarregarComponentesSelecao();
-            return View(editarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Excluir(Guid id)
-    {
-        Result<DetalhesTurmaDto> resultado = servicoTurma.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
             TempData.AddErrorMessage(resultado);
             return RedirectToAction(nameof(Listar));
         }
 
-        ExcluirTurmaViewModel excluirVm = mapeador.Map<ExcluirTurmaViewModel>(resultado.Value);
-
-        return View(excluirVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
-    public ActionResult Excluir(ExcluirTurmaViewModel excluirVm)
+    public ActionResult Excluir(Guid id)
     {
-        Result resultado = servicoTurma.Excluir(excluirVm.Id);
+        Result resultado = servicoTurma.Excluir(id);
 
         if (resultado.IsFailed)
             TempData.AddErrorMessage(resultado);
@@ -123,7 +79,7 @@ public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurs
         return RedirectToAction(nameof(Listar));
     }
 
-       private void CarregarComponentesSelecao()
+    private void CarregarComponentesSelecao()
     {
         List<SelectListItem> cursos = servicoCurso.SelecionarTodos()
             .Select(c => new SelectListItem
@@ -145,4 +101,3 @@ public class TurmaController(ServicoTurma servicoTurma, ServicoCurso servicoCurs
         ViewBag.Instrutores = instrutores;
     }
 }
-

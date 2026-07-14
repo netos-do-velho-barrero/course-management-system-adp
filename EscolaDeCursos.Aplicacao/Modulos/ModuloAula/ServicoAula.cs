@@ -67,13 +67,13 @@ public class ServicoAula : ServicoBase<Aula>
         return Result.Ok();
     }
 
-    public List<ListarAulaDto> SelecionarTodos()
-    {
-        return repositorioAula
-            .SelecionarTodos()
-            .Select(a => new ListarAulaDto(a.Id, a.Titulo, a.Ordem, a.CursoId))
-            .ToList();
-    }
+   public List<ListarAulaDto> SelecionarTodos()
+{
+    return repositorioAula
+        .SelecionarTodos()
+        .Select(a => new ListarAulaDto(a.Id, a.Titulo, a.Ordem, a.Duracao, a.CursoId))
+        .ToList();
+}
 
     public Result<DetalhesAulaDto> SelecionarPorId(Guid id)
     {

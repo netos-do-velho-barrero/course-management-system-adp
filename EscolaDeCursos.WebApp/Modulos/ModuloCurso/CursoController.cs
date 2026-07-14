@@ -21,22 +21,9 @@ public class CursoController(
 
         List<ListarCursosViewModel> listarVms = mapeador.Map<List<ListarCursosViewModel>>(dtos);
 
+        ViewBag.Categorias = CarregarCategorias();
+
         return View(listarVms);
-    }
-
-    [HttpGet]
-    public ActionResult Cadastrar()
-    {
-        CadastrarCursoViewModel cadastrarVm = new CadastrarCursoViewModel(
-            string.Empty,
-            string.Empty,
-            0,
-            (NivelCurso)(-1),
-            null, // Alterado de Guid.Empty para null para coincidir com o Guid?
-            CarregarCategorias()
-        );
-
-        return View(cadastrarVm);
     }
 
     [HttpPost]
@@ -44,53 +31,20 @@ public class CursoController(
     {
         if (!ModelState.IsValid)
         {
-            cadastrarVm = cadastrarVm with
-            {
-                Categorias = CarregarCategorias()
-            };
-
-            return View(cadastrarVm);
+            TempData["MensagemErro"] = "Por favor, preencha todos os campos obrigatórios.";
+            return RedirectToAction(nameof(Listar));
         }
 
         CadastrarCursoDto dto = mapeador.Map<CadastrarCursoDto>(cadastrarVm);
-
         Result resultado = servicoCurso.Cadastrar(dto);
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-
-            cadastrarVm = cadastrarVm with
-            {
-                Categorias = CarregarCategorias()
-            };
-
-            return View(cadastrarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Editar(Guid id)
-    {
-        Result<DetalhesCursoDto> resultado = servicoCurso.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
             TempData.AddErrorMessage(resultado);
-
             return RedirectToAction(nameof(Listar));
         }
 
-        EditarCursoViewModel editarVm = mapeador.Map<EditarCursoViewModel>(resultado.Value);
-
-        editarVm = editarVm with
-        {
-            Categorias = CarregarCategorias()
-        };
-
-        return View(editarVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
@@ -98,12 +52,8 @@ public class CursoController(
     {
         if (!ModelState.IsValid)
         {
-            editarVm = editarVm with
-            {
-                Categorias = CarregarCategorias()
-            };
-
-            return View(editarVm);
+            TempData["MensagemErro"] = "Por favor, preencha todos os campos obrigatórios.";
+            return RedirectToAction(nameof(Listar));
         }
 
         EditarCursoDto dto = mapeador.Map<EditarCursoDto>(editarVm);
@@ -112,47 +62,23 @@ public class CursoController(
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-
-            editarVm = editarVm with
-            {
-                Categorias = CarregarCategorias()
-            };
-
-            return View(editarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Excluir(Guid id)
-    {
-        Result<DetalhesCursoDto> resultado = servicoCurso.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
             TempData.AddErrorMessage(resultado);
-
             return RedirectToAction(nameof(Listar));
         }
 
-        ExcluirCursoViewModel excluirVm = mapeador.Map<ExcluirCursoViewModel>(resultado.Value);
-
-        return View(excluirVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
-    public ActionResult Excluir(ExcluirCursoViewModel excluirVm)
+    public ActionResult Excluir(Guid id)
     {
-        Result resultado = servicoCurso.Excluir(excluirVm.Id);
+        Result resultado = servicoCurso.Excluir(id);
 
         if (resultado.IsFailed)
             TempData.AddErrorMessage(resultado);
 
         return RedirectToAction(nameof(Listar));
     }
-
 
     private List<SelectListItem> CarregarCategorias()
     {

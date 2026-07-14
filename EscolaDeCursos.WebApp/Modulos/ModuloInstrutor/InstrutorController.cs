@@ -18,19 +18,14 @@ public class InstrutorController(ServicoInstrutor servicoInstrutor, IMapper mape
         return View(listarVms);
     }
 
-    [HttpGet]
-    public ActionResult Cadastrar()
-    {
-        CadastrarInstrutorViewModel cadastrarVm = new CadastrarInstrutorViewModel();
-
-        return View(cadastrarVm);
-    }
-
     [HttpPost]
     public ActionResult Cadastrar(CadastrarInstrutorViewModel cadastrarVm)
     {
         if (!ModelState.IsValid)
-            return View(cadastrarVm);
+        {
+            TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
+            return RedirectToAction(nameof(Listar));
+        }
 
         CadastrarInstrutorDto dto = mapeador.Map<CadastrarInstrutorDto>(cadastrarVm);
 
@@ -38,34 +33,21 @@ public class InstrutorController(ServicoInstrutor servicoInstrutor, IMapper mape
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            return View(cadastrarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Editar(Guid id)
-    {
-        Result<DetalhesInstrutorDto> resultado = servicoInstrutor.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
             TempData.AddErrorMessage(resultado);
             return RedirectToAction(nameof(Listar));
         }
 
-        EditarInstrutorViewModel editarVm = mapeador.Map<EditarInstrutorViewModel>(resultado.Value);
-
-        return View(editarVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
     public ActionResult Editar(EditarInstrutorViewModel editarVm)
     {
         if (!ModelState.IsValid)
-            return View(editarVm);
+        {
+            TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
+            return RedirectToAction(nameof(Listar));
+        }
 
         EditarInstrutorDto dto = mapeador.Map<EditarInstrutorDto>(editarVm);
 
@@ -73,33 +55,17 @@ public class InstrutorController(ServicoInstrutor servicoInstrutor, IMapper mape
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            return View(editarVm);
+            TempData.AddErrorMessage(resultado);
+            return RedirectToAction(nameof(Listar));
         }
 
         return RedirectToAction(nameof(Listar));
     }
 
-    [HttpGet]
+    [HttpPost]
     public ActionResult Excluir(Guid id)
     {
-        Result<DetalhesInstrutorDto> resultado = servicoInstrutor.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
-            TempData.AddErrorMessage(resultado);
-            return RedirectToAction(nameof(Listar));
-        }
-
-        ExcluirInstrutorViewModel excluirVm = mapeador.Map<ExcluirInstrutorViewModel>(resultado.Value);
-
-        return View(excluirVm);
-    }
-
-    [HttpPost]
-    public ActionResult Excluir(ExcluirInstrutorViewModel excluirVm)
-    {
-        Result resultado = servicoInstrutor.Excluir(excluirVm.Id);
+        Result resultado = servicoInstrutor.Excluir(id);
 
         if (resultado.IsFailed)
             TempData.AddErrorMessage(resultado);

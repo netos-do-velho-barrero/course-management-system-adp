@@ -60,13 +60,13 @@ public class ServicoInstrutor : ServicoBase<Instrutor>
         return Result.Ok();
     }
 
-    public List<ListarInstrutorDto> SelecionarTodos()
-    {
-        return repositorioInstrutor
-            .SelecionarTodos()
-            .Select(i => new ListarInstrutorDto(i.Id, i.Nome, i.Email))
-            .ToList();
-    }
+   public List<ListarInstrutorDto> SelecionarTodos()
+{
+    return repositorioInstrutor
+        .SelecionarTodos()
+        .Select(i => new ListarInstrutorDto(i.Id, i.Nome, i.Telefone, i.Email))
+        .ToList();
+}
 
     public Result<DetalhesInstrutorDto> SelecionarPorId(Guid id)
     {

@@ -18,21 +18,14 @@ public class AlunoController(ServicoAluno servicoAluno, IMapper mapeador) : Cont
         return View(listarVms);
     }
 
-    [HttpGet]
-    [HttpGet]
-    public ActionResult Cadastrar()
-    {
-        CadastrarAlunoViewModel cadastrarVm = new CadastrarAlunoViewModel();
-
-        return View(cadastrarVm);
-    }
-    
-
     [HttpPost]
     public ActionResult Cadastrar(CadastrarAlunoViewModel cadastrarVm)
     {
         if (!ModelState.IsValid)
-            return View(cadastrarVm);
+        {
+            TempData["MensagemErro"] = "Dados inválidos. Certifique-se de preencher todos os campos corretamente.";
+            return RedirectToAction(nameof(Listar));
+        }
 
         CadastrarAlunoDto dto = mapeador.Map<CadastrarAlunoDto>(cadastrarVm);
 
@@ -40,34 +33,21 @@ public class AlunoController(ServicoAluno servicoAluno, IMapper mapeador) : Cont
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            return View(cadastrarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Editar(Guid id)
-    {
-        Result<DetalhesAlunoDto> resultado = servicoAluno.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
-            TempData.AddErrorMessage(resultado);
+            TempData["MensagemErro"] = string.Join(" ", resultado.Errors.Select(x => x.Message));
             return RedirectToAction(nameof(Listar));
         }
 
-        EditarAlunoViewModel editarVm = mapeador.Map<EditarAlunoViewModel>(resultado.Value);
-
-        return View(editarVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
     public ActionResult Editar(EditarAlunoViewModel editarVm)
     {
         if (!ModelState.IsValid)
-            return View(editarVm);
+        {
+            TempData["MensagemErro"] = "Dados de edição inválidos. Verifique as informações digitadas.";
+            return RedirectToAction(nameof(Listar));
+        }
 
         EditarAlunoDto dto = mapeador.Map<EditarAlunoDto>(editarVm);
 
@@ -75,27 +55,11 @@ public class AlunoController(ServicoAluno servicoAluno, IMapper mapeador) : Cont
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            return View(editarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Excluir(Guid id)
-    {
-        Result<DetalhesAlunoDto> resultado = servicoAluno.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
-            TempData.AddErrorMessage(resultado);
+            TempData["MensagemErro"] = string.Join(" ", resultado.Errors.Select(x => x.Message));
             return RedirectToAction(nameof(Listar));
         }
 
-        ExcluirAlunoViewModel excluirVm = mapeador.Map<ExcluirAlunoViewModel>(resultado.Value);
-
-        return View(excluirVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
@@ -104,7 +68,9 @@ public class AlunoController(ServicoAluno servicoAluno, IMapper mapeador) : Cont
         Result resultado = servicoAluno.Excluir(excluirVm.Id);
 
         if (resultado.IsFailed)
-            TempData.AddErrorMessage(resultado);
+        {
+            TempData["MensagemErro"] = string.Join(" ", resultado.Errors.Select(x => x.Message));
+        }
 
         return RedirectToAction(nameof(Listar));
     }

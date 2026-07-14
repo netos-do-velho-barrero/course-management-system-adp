@@ -5,22 +5,23 @@ namespace EscolaDeCursos.WebApp.Modulos.ModuloTurma;
 public record ListarTurmaViewModel
 {
     public Guid Id { get; set; }
+    public Guid CursoId { get; set; }
     public string Curso { get; set; } = string.Empty;
+    public Guid InstrutorId { get; set; }
     public string Instrutor { get; set; } = string.Empty;
     public DateTime DataInicio { get; set; }
     public DateTime DataTermino { get; set; }
     public int NumeroMaximoAlunos { get; set; }
+    public int QuantidadeAlunos { get; set; } // Propriedade adicionada
 }
 
 public record CadastrarTurmaViewModel
 {
     public Guid Id { get; set; }
 
-    // Altere para Guid? (anulável)
     [Required(ErrorMessage = "O campo \"Curso\" é obrigatório.")]
     public Guid? CursoId { get; set; }
 
-    // Altere para Guid? (anulável)
     [Required(ErrorMessage = "O campo \"Instrutor\" é obrigatório.")]
     public Guid? InstrutorId { get; set; }
 
@@ -43,7 +44,6 @@ public record EditarTurmaViewModel
 
     [Required(ErrorMessage = "O campo \"Curso\" é obrigatório.")]
     public Guid? CursoId { get; set; }
-
 
     [Required(ErrorMessage = "O campo \"Instrutor\" é obrigatório.")]
     public Guid? InstrutorId { get; set; }

@@ -1,6 +1,7 @@
 namespace EscolaDeCursos.Aplicacao.Modulos.ModuloAluno;
 
-public record ListarAlunoDto(Guid Id, string Nome, string Cpf, string Email);
+// ADICIONADO: "string Telefone" no DTO de listagem
+public record ListarAlunoDto(Guid Id, string Nome, string Cpf, string Telefone, string Email);
 
 public record CadastrarAlunoDto(string Nome, string Cpf, string Telefone, string Email);
 

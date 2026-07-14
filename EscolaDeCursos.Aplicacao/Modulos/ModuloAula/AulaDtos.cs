@@ -1,6 +1,7 @@
 namespace EscolaDeCursos.Aplicacao.Modulos.ModuloAula;
 
-public record ListarAulaDto(Guid Id, string Titulo, int Ordem, Guid CursoId);
+// ADICIONADO: "int Duracao" no DTO de listagem
+public record ListarAulaDto(Guid Id, string Titulo, int Ordem, int Duracao, Guid CursoId);
 
 public record CadastrarAulaDto(string Titulo, int Ordem, int Duracao, Guid CursoId);
 

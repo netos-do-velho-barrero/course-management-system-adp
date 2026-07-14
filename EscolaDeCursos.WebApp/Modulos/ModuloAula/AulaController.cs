@@ -1,41 +1,40 @@
 using AutoMapper;
 using FluentResults;
 using EscolaDeCursos.Aplicacao.Modulos.ModuloAula;
-using EscolaDeCursos.Aplicacao.Modulos.ModuloCurso; // Ajuste para o namespace correto do seu serviço de curso
+using EscolaDeCursos.Aplicacao.Modulos.ModuloCurso;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using EscolaDeCursos.WebApp.Compartilhado.Extensions;
 
 namespace EscolaDeCursos.WebApp.Modulos.ModuloAula;
 
 public class AulaController(ServicoAula servicoAula, ServicoCurso servicoCurso, IMapper mapeador) : Controller
 {
     [HttpGet]
-    public ActionResult Listar()
+public ActionResult Listar()
+{
+
+    var cursos = ObterCursosCadastrados();
+
+    ViewBag.Cursos = cursos;
+
+    List<ListarAulaDto> dtos = servicoAula.SelecionarTodos();
+    List<ListarAulaViewModel> listarVms = mapeador.Map<List<ListarAulaViewModel>>(dtos);
+
+    foreach (var vm in listarVms)
     {
-        List<ListarAulaDto> dtos = servicoAula.SelecionarTodos();
-        List<ListarAulaViewModel> listarVms = mapeador.Map<List<ListarAulaViewModel>>(dtos);
-        return View(listarVms);
+        var cursoRelacionado = cursos.FirstOrDefault(c => c.Value == vm.CursoId.ToString());
+        vm.CursoNome = cursoRelacionado?.Text ?? "Curso não encontrado";
     }
 
-    [HttpGet]
-    public ActionResult Cadastrar()
-    {
-        CadastrarAulaViewModel cadastrarVm = new CadastrarAulaViewModel
-        {
-            Cursos = ObterCursosCadastrados()
-        };
-
-        return View(cadastrarVm);
-    }
-
+    return View(listarVms);
+}
     [HttpPost]
     public ActionResult Cadastrar(CadastrarAulaViewModel cadastrarVm)
     {
         if (!ModelState.IsValid)
         {
-            cadastrarVm.Cursos = ObterCursosCadastrados();
-            return View(cadastrarVm);
+            TempData["MensagemErro"] = "Dados inválidos. Certifique-se de preencher todos os campos obrigatórios.";
+            return RedirectToAction(nameof(Listar));
         }
 
         CadastrarAulaDto dto = mapeador.Map<CadastrarAulaDto>(cadastrarVm);
@@ -43,29 +42,11 @@ public class AulaController(ServicoAula servicoAula, ServicoCurso servicoCurso, 
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            cadastrarVm.Cursos = ObterCursosCadastrados();
-            return View(cadastrarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Editar(Guid id)
-    {
-        Result<DetalhesAulaDto> resultado = servicoAula.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
-            TempData.AddErrorMessage(resultado);
+            TempData["MensagemErro"] = string.Join(" ", resultado.Errors.Select(x => x.Message));
             return RedirectToAction(nameof(Listar));
         }
 
-        EditarAulaViewModel editarVm = mapeador.Map<EditarAulaViewModel>(resultado.Value);
-        editarVm.Cursos = ObterCursosCadastrados();
-
-        return View(editarVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
@@ -73,8 +54,8 @@ public class AulaController(ServicoAula servicoAula, ServicoCurso servicoCurso, 
     {
         if (!ModelState.IsValid)
         {
-            editarVm.Cursos = ObterCursosCadastrados();
-            return View(editarVm);
+            TempData["MensagemErro"] = "Dados de edição inválidos. Verifique as informações digitadas.";
+            return RedirectToAction(nameof(Listar));
         }
 
         EditarAulaDto dto = mapeador.Map<EditarAulaDto>(editarVm);
@@ -82,27 +63,11 @@ public class AulaController(ServicoAula servicoAula, ServicoCurso servicoCurso, 
 
         if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            editarVm.Cursos = ObterCursosCadastrados();
-            return View(editarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Excluir(Guid id)
-    {
-        Result<DetalhesAulaDto> resultado = servicoAula.SelecionarPorId(id);
-
-        if (resultado.IsFailed)
-        {
-            TempData.AddErrorMessage(resultado);
+            TempData["MensagemErro"] = string.Join(" ", resultado.Errors.Select(x => x.Message));
             return RedirectToAction(nameof(Listar));
         }
 
-        ExcluirAulaViewModel excluirVm = mapeador.Map<ExcluirAulaViewModel>(resultado.Value);
-        return View(excluirVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
@@ -111,7 +76,9 @@ public class AulaController(ServicoAula servicoAula, ServicoCurso servicoCurso, 
         Result resultado = servicoAula.Excluir(excluirVm.Id);
 
         if (resultado.IsFailed)
-            TempData.AddErrorMessage(resultado);
+        {
+            TempData["MensagemErro"] = string.Join(" ", resultado.Errors.Select(x => x.Message));
+        }
 
         return RedirectToAction(nameof(Listar));
     }

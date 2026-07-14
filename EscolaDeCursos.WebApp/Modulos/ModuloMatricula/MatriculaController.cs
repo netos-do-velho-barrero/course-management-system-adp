@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using EscolaDeCursos.Aplicacao.Modulos.ModuloMatricula;
 using EscolaDeCursos.Aplicacao.Modulos.ModuloAluno;
 using EscolaDeCursos.Aplicacao.Modulos.ModuloTurma;
-using EscolaDeCursos.Dominio.Modulos.ModuloMatricula;
 using EscolaDeCursos.WebApp.Compartilhado.Extensions;
 
 namespace EscolaDeCursos.WebApp.Modulos.ModuloMatricula;
@@ -19,21 +18,29 @@ public class MatriculaController(
     [HttpGet]
     public ActionResult Listar()
     {
-        List<ListarMatriculaDto> dtos = servicoMatricula.SelecionarTodos();
+        // 1. Busca os alunos e turmas cadastrados primeiro
+        var alunos = ObterAlunosCadastrados();
+        var turmas = ObterTurmasCadastradas();
 
+        // 2. Alimenta a ViewBag para os dropdowns dos modais
+        ViewBag.Alunos = alunos;
+        ViewBag.Turmas = turmas;
+
+        // 3. Carrega as matrículas e mapeia para a ViewModel
+        List<ListarMatriculaDto> dtos = servicoMatricula.SelecionarTodos();
         List<ListarMatriculaViewModel> listarVms = mapeador.Map<List<ListarMatriculaViewModel>>(dtos);
 
+        // 4. Associa manualmente os nomes com base no ID (como no seu exemplo)
+        foreach (var vm in listarVms)
+        {
+            var alunoRelacionado = alunos.FirstOrDefault(a => a.Value == vm.AlunoId.ToString());
+            vm.AlunoNome = alunoRelacionado?.Text ?? "Aluno não encontrado";
+
+            var turmaRelacionada = turmas.FirstOrDefault(t => t.Value == vm.TurmaId.ToString());
+            vm.TurmaNome = turmaRelacionada?.Text ?? "Turma não encontrada";
+        }
+
         return View(listarVms);
-    }
-
-    [HttpGet]
-    public ActionResult Cadastrar()
-    {
-        CarregarComponentesSelecao();
-
-        CadastrarMatriculaViewModel cadastrarVm = new CadastrarMatriculaViewModel();
-
-        return View(cadastrarVm);
     }
 
     [HttpPost]
@@ -41,28 +48,12 @@ public class MatriculaController(
     {
         if (!ModelState.IsValid)
         {
-            CarregarComponentesSelecao();
-            return View(cadastrarVm);
+            TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
+            return RedirectToAction(nameof(Listar));
         }
 
         CadastrarMatriculaDto dto = mapeador.Map<CadastrarMatriculaDto>(cadastrarVm);
-
         Result resultado = servicoMatricula.Cadastrar(dto);
-
-        if (resultado.IsFailed)
-        {
-            ModelState.AddModelError(resultado);
-            CarregarComponentesSelecao();
-            return View(cadastrarVm);
-        }
-
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Editar(Guid id)
-    {
-        Result<DetalhesMatriculaDto> resultado = servicoMatricula.SelecionarPorId(id);
 
         if (resultado.IsFailed)
         {
@@ -70,34 +61,20 @@ public class MatriculaController(
             return RedirectToAction(nameof(Listar));
         }
 
-        EditarMatriculaViewModel editarVm = mapeador.Map<EditarMatriculaViewModel>(resultado.Value);
-
-        return View(editarVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
     public ActionResult Editar(EditarMatriculaViewModel editarVm)
     {
         if (!ModelState.IsValid)
-            return View(editarVm);
-
-        EditarMatriculaDto dto = mapeador.Map<EditarMatriculaDto>(editarVm);
-
-        Result resultado = servicoMatricula.Editar(dto);
-
-        if (resultado.IsFailed)
         {
-            ModelState.AddModelError(resultado);
-            return View(editarVm);
+            TempData["MensagemErro"] = "Preencha todos os campos corretamente.";
+            return RedirectToAction(nameof(Listar));
         }
 
-        return RedirectToAction(nameof(Listar));
-    }
-
-    [HttpGet]
-    public ActionResult Excluir(Guid id)
-    {
-        Result<DetalhesMatriculaDto> resultado = servicoMatricula.SelecionarPorId(id);
+        EditarMatriculaDto dto = mapeador.Map<EditarMatriculaDto>(editarVm);
+        Result resultado = servicoMatricula.Editar(dto);
 
         if (resultado.IsFailed)
         {
@@ -105,15 +82,13 @@ public class MatriculaController(
             return RedirectToAction(nameof(Listar));
         }
 
-        ExcluirMatriculaViewModel excluirVm = mapeador.Map<ExcluirMatriculaViewModel>(resultado.Value);
-
-        return View(excluirVm);
+        return RedirectToAction(nameof(Listar));
     }
 
     [HttpPost]
-    public ActionResult Excluir(ExcluirMatriculaViewModel excluirVm)
+    public ActionResult Excluir(Guid id)
     {
-        Result resultado = servicoMatricula.Excluir(excluirVm.Id);
+        Result resultado = servicoMatricula.Excluir(id);
 
         if (resultado.IsFailed)
             TempData.AddErrorMessage(resultado);
@@ -143,25 +118,18 @@ public class MatriculaController(
         return RedirectToAction(nameof(Listar));
     }
 
-    private void CarregarComponentesSelecao()
+    // Métodos auxiliares para buscar os registros de Alunos e Turmas
+    private List<SelectListItem> ObterAlunosCadastrados()
     {
-        List<SelectListItem> alunos = servicoAluno.SelecionarTodos()
-            .Select(a => new SelectListItem
-            {
-                Value = a.Id.ToString(),
-                Text = a.Nome
-            })
+        return servicoAluno.SelecionarTodos()
+            .Select(a => new SelectListItem { Value = a.Id.ToString(), Text = a.Nome })
             .ToList();
+    }
 
-        List<SelectListItem> turmas = servicoTurma.SelecionarTodos()
-            .Select(t => new SelectListItem
-            {
-                Value = t.Id.ToString(),
-                Text = $"{t.CursoId} - {t.InstrutorId} ({t.DataInicio:dd/MM/yyyy})"
-            })
+    private List<SelectListItem> ObterTurmasCadastradas()
+    {
+        return servicoTurma.SelecionarTodos()
+            .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Curso })
             .ToList();
-
-        ViewBag.Alunos = alunos;
-        ViewBag.Turmas = turmas;
     }
 }

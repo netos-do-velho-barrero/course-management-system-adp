@@ -64,7 +64,8 @@ public class ServicoAluno : ServicoBase<Aluno>
     {
         return repositorioAluno
             .SelecionarTodos()
-            .Select(a => new ListarAlunoDto(a.Id, a.Nome, a.Cpf, a.Email))
+            // CORRIGIDO: Agora mapeia também a propriedade "Telefone"
+            .Select(a => new ListarAlunoDto(a.Id, a.Nome, a.Cpf, a.Telefone, a.Email))
             .ToList();
     }
 

@@ -1,57 +1,270 @@
 @using EscolaDeCursos.WebApp.Modulos.ModuloAluno
+@model List<ListarAlunoViewModel>
+
 @{
     Layout = "_Layout";
     ViewBag.Titulo = "Listagem de Alunos";
 }
 
-@model List<ListarAlunoViewModel>;
-
-<a class="btn btn-outline-primary rounded-pill px-4 mb-3" asp-action="Cadastrar">Cadastrar Novo Aluno</a>
-
 @if (TempData["MensagemErro"] is string mensagemErro)
 {
-    <div class="alert alert-danger border-start border-danger border-4 rounded-3" role="alert">
-        @mensagemErro
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 8px;">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <div><strong>Ops!</strong> @mensagemErro</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-@if (Model.Count == 0)
-{
-    <div class="alert alert-primary border-start border-primary border-4 rounded-3" role="alert">
-        Nenhum aluno cadastrado.
+<div class="container-fluid p-0">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+        <div>
+            <h1 class="fw-bold h3 text-dark mb-1">Alunos</h1>
+            <p class="text-secondary mb-0 small">Listagem de alunos do sistema</p>
+        </div>
+
+        <!-- Ações do Topo: Alinhados à direita -->
+        <div class="d-flex gap-2 ms-auto">
+            <button class="btn btn-light border d-flex align-items-center gap-2 fw-semibold px-3"
+                    id="btnAlternarLayout" style="border-radius: 8px;">
+                <i class="bi bi-grid" id="layoutIcon"></i>
+                <span class="d-none d-md-inline" id="layoutText">Ver em Cards</span>
+            </button>
+
+            <!-- Abre o Modal de Cadastro -->
+            <button class="btn btn-primary px-4 fw-semibold d-flex align-items-center gap-2"
+                    style="background-color: #1a56db; border: none; border-radius: 8px; padding: 10px 20px;"
+                    data-bs-toggle="modal" data-bs-target="#modalAluno" onclick="configurarModalCadastro()">
+                <i class="bi bi-plus-lg"></i> Novo Aluno
+            </button>
+        </div>
     </div>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-2">
-        @foreach (ListarAlunoViewModel a in Model)
+
+    <!-- 1. MODO TABELA -->
+    <div class="card shadow-sm border-0 d-md-block" id="containerTabela" style="border-radius: 12px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="background-color: #ffffff;">
+                <thead class="table-light text-uppercase small text-secondary" style="font-size: 0.75rem; letter-spacing: 0.5px; background-color: #f8fafc;">
+                    <tr>
+                        <th class="ps-4 py-3">Nome</th>
+                        <th class="py-3">CPF</th>
+                        <th class="py-3">Telefone</th>
+                        <th class="py-3">E-mail</th>
+                        <th class="text-end pe-4 py-3" style="width: 240px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="text-dark" style="font-size: 0.95rem;">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (ListarAlunoViewModel a in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold text-dark">@a.Nome</td>
+                                <td>@a.Cpf</td>
+                                <td>@a.Telefone</td>
+                                <td class="text-break">@a.Email</td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-sm px-3 py-2 d-inline-flex align-items-center gap-2 fw-medium"
+                                                style="background-color: #eff6ff; color: #1a56db; border: 1px solid #bfdbfe; border-radius: 8px;"
+                                                data-bs-toggle="modal" data-bs-target="#modalAluno"
+                                                onclick="configurarModalEdicao('@a.Id', '@a.Nome', '@a.Cpf', '@a.Telefone', '@a.Email')">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+                                        <button class="btn btn-sm px-3 py-2 d-inline-flex align-items-center gap-2 fw-medium"
+                                                style="background-color: #fef2f2; color: #dc3545; border: 1px solid #fecaca; border-radius: 8px;"
+                                                data-bs-toggle="modal" data-bs-target="#modalExcluir"
+                                                onclick="configurarModalExclusao('@a.Id', '@a.Nome')">
+                                            <i class="bi bi-trash3"></i> Excluir
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-secondary">
+                                <i class="bi bi-folder-x fs-2 d-block mb-2 text-muted"></i>
+                                Nenhum aluno cadastrado até o momento.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. MODO CARDS -->
+    <div class="row g-3 d-none" id="containerCards">
+        @if (Model != null && Model.Any())
         {
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-                            <h5 class="card-title mb-0">@a.Nome</h5>
-                            <span class="badge text-bg-primary rounded-pill">@a.Id.ToString().Substring(0, 8)</span>
-                        </div>
+            foreach (ListarAlunoViewModel a in Model)
+            {
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 12px; background-color: #ffffff;">
+                        <div class="d-flex flex-column h-100">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                <h5 class="fw-bold text-dark mb-0">@a.Nome</h5>
+                                <span class="badge text-bg-primary rounded-pill px-2 py-1 small" style="background-color: #1a56db !important; font-size: 0.75rem;">
+                                    @a.Id.ToString().Substring(0, 8)
+                                </span>
+                            </div>
 
-                        <dl class="row g-2 mb-4">
-                            <dt class="col-5 text-secondary fw-semibold">CPF</dt>
-                            <dd class="col-7 mb-0 text-break">@a.Cpf</dd>
+                            <dl class="row g-2 mb-4" style="font-size: 0.9rem;">
+                                <dt class="col-5 text-secondary fw-semibold">CPF</dt>
+                                <dd class="col-7 mb-0 text-break text-dark">@a.Cpf</dd>
 
-                            <dt class="col-5 text-secondary fw-semibold">Telefone</dt>
-                            <dd class="col-7 mb-0 text-break">@a.Telefone</dd>
+                                <dt class="col-5 text-secondary fw-semibold">Telefone</dt>
+                                <dd class="col-7 mb-0 text-break text-dark">@a.Telefone</dd>
 
-                            <dt class="col-5 text-secondary fw-semibold">E-mail</dt>
-                            <dd class="col-7 mb-0 text-break">@a.Email</dd>
-                        </dl>
+                                <dt class="col-5 text-secondary fw-semibold">E-mail</dt>
+                                <dd class="col-7 mb-0 text-break text-dark text-break">@a.Email</dd>
+                            </dl>
 
-                        <div class="d-flex flex-wrap gap-2 mt-auto justify-content-end">
-                            <a class="btn btn-outline-primary btn-sm rounded-pill px-3" asp-action="Editar" asp-route-id="@a.Id">Editar</a>
-                            <a class="btn btn-outline-primary btn-sm rounded-pill px-3" asp-action="Excluir" asp-route-id="@a.Id">Excluir</a>
+                            <!-- Botões de Ação -->
+                            <div class="mt-auto d-flex gap-2">
+                                <button class="btn btn-sm px-3 py-2 d-inline-flex align-items-center justify-content-center gap-2 fw-medium w-50"
+                                        style="background-color: #eff6ff; color: #1a56db; border: 1px solid #bfdbfe; border-radius: 8px;"
+                                        data-bs-toggle="modal" data-bs-target="#modalAluno"
+                                        onclick="configurarModalEdicao('@a.Id', '@a.Nome', '@a.Cpf', '@a.Telefone', '@a.Email')">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </button>
+                                <button class="btn btn-sm px-3 py-2 d-inline-flex align-items-center justify-content-center gap-2 fw-medium w-50"
+                                        style="background-color: #fef2f2; color: #dc3545; border: 1px solid #fecaca; border-radius: 8px;"
+                                        data-bs-toggle="modal" data-bs-target="#modalExcluir"
+                                        onclick="configurarModalExclusao('@a.Id', '@a.Nome')">
+                                    <i class="bi bi-trash3"></i> Excluir
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5 text-secondary card border-0 shadow-sm">
+                <i class="bi bi-folder-x fs-2 d-block mb-2 text-muted"></i>
+                Nenhum aluno cadastrado até o momento.
             </div>
         }
     </div>
+</div>
+
+<!-- MODAL CADASTRO / EDIÇÃO DE ALUNO (IDÊNTICO AO DE CATEGORIA) -->
+<div class="modal fade" id="modalAluno" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+            <div class="modal-header border-0 pt-4 px-4 pb-2">
+                <h5 class="modal-title fw-bold text-dark fs-5" id="modalAlunoTitulo">Novo Aluno</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formAluno" method="post">
+                <input type="hidden" id="alunoId" name="Id" />
+                <div class="modal-body px-4 py-2">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark mb-1">Nome Completo <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="inputNome" name="Nome" placeholder="Ex: Carlos Eduardo da Silva" required style="border-radius: 8px; padding: 10px; border: 1px solid #cbd5e1;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark mb-1">CPF <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="inputCpf" name="Cpf" placeholder="000.000.000-00" required style="border-radius: 8px; padding: 10px; border: 1px solid #cbd5e1;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark mb-1">Telefone <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="inputTelefone" name="Telefone" placeholder="(48) 99999-9999" required style="border-radius: 8px; padding: 10px; border: 1px solid #cbd5e1;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark mb-1">E-mail <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="inputEmail" name="Email" placeholder="nome@email.com" required style="border-radius: 8px; padding: 10px; border: 1px solid #cbd5e1;">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 d-flex justify-content-end gap-2 pb-4 px-4 pt-2">
+                    <button type="button" class="btn btn-light px-4 fw-medium text-secondary" data-bs-dismiss="modal" style="border-radius: 8px; border: 1px solid #e2e8f0;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold" style="background-color: #1a56db; border: none; border-radius: 8px;">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EXCLUSÃO DE ALUNO -->
+<div class="modal fade" id="modalExcluir" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+            <form id="formExcluir" method="post" asp-action="Excluir">
+                <input type="hidden" id="excluirId" name="Id" />
+                <div class="modal-body text-center p-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle rounded-circle mb-3" style="width: 56px; height: 56px;">
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Excluir Aluno?</h5>
+                    <p class="text-secondary small mb-4">Esta ação não pode ser desfeita. Tem certeza que deseja remover o aluno "<strong id="excluirNome"></strong>"?</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-light px-4 fw-medium text-secondary" data-bs-dismiss="modal" style="border-radius: 8px; border: 1px solid #e2e8f0;">Não, Cancelar</button>
+                        <button type="submit" class="btn btn-danger px-4 fw-semibold" style="border-radius: 8px;">Sim, Excluir</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Configurações dinâmicas dos Modais de Alunos
+        function configurarModalCadastro() {
+            document.getElementById('modalAlunoTitulo').innerText = 'Novo Aluno';
+            document.getElementById('formAluno').action = '@Url.Action("Cadastrar", "Aluno")';
+            document.getElementById('alunoId').value = '';
+            document.getElementById('inputNome').value = '';
+            document.getElementById('inputCpf').value = '';
+            document.getElementById('inputTelefone').value = '';
+            document.getElementById('inputEmail').value = '';
+        }
+
+        function configurarModalEdicao(id, nome, cpf, telefone, email) {
+            document.getElementById('modalAlunoTitulo').innerText = 'Editar Aluno';
+            document.getElementById('formAluno').action = '@Url.Action("Editar", "Aluno")';
+            document.getElementById('alunoId').value = id;
+            document.getElementById('inputNome').value = nome;
+            document.getElementById('inputCpf').value = cpf;
+            document.getElementById('inputTelefone').value = telefone;
+            document.getElementById('inputEmail').value = email;
+        }
+
+        function configurarModalExclusao(id, nome) {
+            document.getElementById('excluirId').value = id;
+            document.getElementById('excluirNome').innerText = nome;
+        }
+
+        // Alternador de Layout Dinâmico
+        const btnAlternar = document.getElementById('btnAlternarLayout');
+        const containerTabela = document.getElementById('containerTabela');
+        const containerCards = document.getElementById('containerCards');
+        const layoutIcon = document.getElementById('layoutIcon');
+        const layoutText = document.getElementById('layoutText');
+
+        btnAlternar.addEventListener('click', () => {
+            const tabelaVisivel = window.getComputedStyle(containerTabela).display !== 'none';
+
+            containerTabela.classList.remove('d-md-block');
+            containerCards.classList.remove('d-md-none');
+
+            if (tabelaVisivel) {
+                containerTabela.classList.add('d-none');
+                containerCards.classList.remove('d-none');
+                layoutIcon.className = "bi bi-list-task";
+                layoutText.innerText = "Ver em Lista";
+            } else {
+                containerCards.classList.add('d-none');
+                containerTabela.classList.remove('d-none');
+                layoutIcon.className = "bi bi-grid";
+                layoutText.innerText = "Ver em Cards";
+            }
+        });
+    </script>
 }
