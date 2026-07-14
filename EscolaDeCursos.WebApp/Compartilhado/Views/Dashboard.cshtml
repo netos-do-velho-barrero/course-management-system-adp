@@ -27,22 +27,41 @@
             background-color: var(--bg-light);
             color: var(--text-dark);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
         }
 
+        /* --- SIDEBAR BASE --- */
         .sidebar {
             background-color: var(--bg-sidebar);
             width: 260px;
             min-height: 100vh;
             border-right: 1px solid var(--border-color);
             position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1040;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Ocultar no Desktop */
+        .sidebar.collapsed {
+            transform: translateX(-260px);
+        }
+
+        /* --- CONTEÚDO PRINCIPAL --- */
         .main-content {
             margin-left: 260px;
             padding: 30px;
             min-height: 100vh;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Expandir conteúdo quando a sidebar sumir */
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* --- LINKS DE NAVEGAÇÃO --- */
         .nav-link-custom {
             color: #94a3b8;
             padding: 12px 20px;
@@ -67,17 +86,21 @@
             background-color: var(--blue-main);
         }
 
+        /* --- NAVBAR SUPERIOR --- */
         .top-navbar {
-            height: 70px;
+            height: auto;
+            min-height: 70px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
+            padding: 15px 30px;
             margin-bottom: 30px;
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .search-input {
@@ -96,12 +119,14 @@
             box-shadow: 0 0 0 0.25rem rgba(26, 86, 219, 0.1);
         }
 
+        /* --- CARDS DA DASHBOARD --- */
         .dashboard-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            height: 100%;
         }
 
         .card-icon-box {
@@ -112,6 +137,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
+            flex-shrink: 0;
         }
 
         .recent-activity-item {
@@ -134,16 +160,97 @@
             align-items: center;
             justify-content: center;
             font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        /* Contêiner seguro para evitar quebras dos gráficos */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+        }
+
+        /* Cortina escura para fechar a barra ao clicar fora no celular */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1030;
+        }
+
+        /* Botão para recolher/ocultar a barra */
+        .sidebar-toggler {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .sidebar-toggler:hover {
+            background: #e2e8f0;
+        }
+
+        /* --- ADAPTAÇÃO PARA DISPOSITIVOS MÓVEIS (CELULARES E TABLETS) --- */
+        @@media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-100%); /* Começa totalmente oculta */
+            }
+
+            .sidebar.active {
+                transform: translateX(0); /* Desliza para dentro ao clicar */
+            }
+
+            .sidebar-overlay.active {
+                display: block; /* Ativa a cortina escura */
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .top-navbar {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .search-container {
+                width: 100%;
+                order: 3; /* Move a barra de pesquisa para baixo no topo mobile */
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar d-flex flex-column justify-content-between pb-4">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="sidebar d-flex flex-column justify-content-between pb-4" id="sidebar">
         <div>
-            <div class="d-flex align-items-center gap-2 p-4 mb-2">
-                <i class="bi bi-mortarboard-fill fs-3 text-white"></i>
-                <span class="fw-bold fs-4 text-white">EduCore</span>
+            <div class="d-flex align-items-center justify-content-between p-4 mb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-mortarboard-fill fs-3 text-white"></i>
+                    <span class="fw-bold fs-4 text-white">EduCore</span>
+                </div>
+                <button class="btn text-white d-lg-none p-0 border-0" id="closeSidebarBtn">
+                    <i class="bi bi-x-lg fs-4"></i>
+                </button>
             </div>
 
             <div class="nav flex-column">
@@ -167,10 +274,14 @@
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <div class="top-navbar">
-            <div class="d-flex align-items-center">
-                <nav aria-label="breadcrumb">
+            <div class="d-flex align-items-center gap-3">
+                <button class="sidebar-toggler" id="sidebarToggle" aria-label="Alternar Menu">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <nav aria-label="breadcrumb" class="d-none d-sm-block">
                     <ol class="breadcrumb mb-0 small">
                         <li class="breadcrumb-item text-secondary">Home</li>
                         <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Dashboard</li>
@@ -178,18 +289,19 @@
                 </nav>
             </div>
 
-            <div class="d-flex align-items-center gap-4">
-                <div class="position-relative">
-                    <i class="bi bi-search position-absolute text-secondary" style="left: 12px; top: 9px;"></i>
-                    <input type="text" class="form-control search-input" placeholder="Pesquisar...">
-                </div>
+            <div class="search-container position-relative">
+                <i class="bi bi-search position-absolute text-secondary" style="left: 12px; top: 9px;"></i>
+                <input type="text" class="form-control search-input" placeholder="Pesquisar...">
+            </div>
+
+            <div class="d-flex align-items-center gap-3 ms-auto ms-lg-0">
                 <div class="position-relative" style="cursor: pointer;">
                     <i class="bi bi-bell fs-5 text-dark"></i>
                     <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="text-white d-flex align-items-center justify-content-center rounded-circle fw-bold" style="width: 38px; height: 38px; background-color: var(--blue-main);">AD</div>
-                    <div class="d-none d-sm-block">
+                    <div class="d-none d-md-block">
                         <div class="small fw-bold lh-1 text-dark">Administrador</div>
                         <div class="text-secondary" style="font-size: 0.75rem;">Admin</div>
                     </div>
@@ -199,7 +311,7 @@
 
         <div class="container-fluid p-0">
             <div class="row g-4 mb-4">
-                <div class="col-md-4 col-xl" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Curso")'">
+                <div class="col-sm-6 col-xl-3" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Curso")'">
                     <div class="dashboard-card d-flex align-items-center justify-content-between">
                         <div>
                             <div class="text-secondary small fw-bold mb-1">Total de Cursos</div>
@@ -211,7 +323,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-xl" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Aluno")'">
+                <div class="col-sm-6 col-xl-3" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Aluno")'">
                     <div class="dashboard-card d-flex align-items-center justify-content-between">
                         <div>
                             <div class="text-secondary small fw-bold mb-1">Total de Alunos</div>
@@ -223,7 +335,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-xl" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Instrutor")'">
+                <div class="col-sm-6 col-xl-3" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Instrutor")'">
                     <div class="dashboard-card d-flex align-items-center justify-content-between">
                         <div>
                             <div class="text-secondary small fw-bold mb-1">Instrutores</div>
@@ -235,27 +347,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-xl" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Turma")'">
+                <div class="col-sm-6 col-xl-3" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Turma")'">
                     <div class="dashboard-card d-flex align-items-center justify-content-between">
                         <div>
                             <div class="text-secondary small fw-bold mb-1">Turmas Ativas</div>
                             <h3 class="fw-bold mb-1 text-dark">3</h3>
                             <span class="text-warning small fw-bold">Em andamento</span>
                         </div>
-                        <div class="card-icon-box" style="background-color: rgba(255, 193, 7, 0.15); color: #ffc107;">
+                        <div class="card-icon-box" style="background-color: rgba(25, 193, 7, 0.15); color: #ffc107;">
                             <i class="bi bi-calendar-event text-dark fw-bold"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-xl" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Listar", "Matricula")'">
-                    <div class="dashboard-card d-flex align-items-center justify-content-between">
-                        <div>
-                            <div class="text-secondary small fw-bold mb-1">Matrículas</div>
-                            <h3 class="fw-bold mb-1 text-dark">380</h3>
-                            <span class="text-success small fw-bold">+52 este mês</span>
-                        </div>
-                        <div class="card-icon-box" style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545;">
-                            <i class="bi bi-clipboard-check text-dark fw-bold"></i>
                         </div>
                     </div>
                 </div>
@@ -266,14 +366,18 @@
                     <div class="dashboard-card">
                         <h5 class="fw-bold mb-1 fs-6 text-dark">Matrículas por Mês</h5>
                         <div class="text-secondary small mb-4">Evolução de matrículas em 2026</div>
-                        <canvas id="matriculasChart" style="height: 280px; width: 100%;"></canvas>
+                        <div class="chart-container">
+                            <canvas id="matriculasChart"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="dashboard-card">
                         <h5 class="fw-bold mb-1 fs-6 text-dark">Cursos por Categoria</h5>
                         <div class="text-secondary small mb-4">Distribuição atual</div>
-                        <canvas id="categoriasChart" style="height: 280px; width: 100%;"></canvas>
+                        <div class="chart-container">
+                            <canvas id="categoriasChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -283,7 +387,9 @@
                     <div class="dashboard-card">
                         <h5 class="fw-bold mb-1 fs-6 text-dark">Ocupação das Turmas</h5>
                         <div class="text-secondary small mb-4">Capacidade vs alunos matriculados</div>
-                        <canvas id="ocupacaoChart" style="height: 250px; width: 100%;"></canvas>
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="ocupacaoChart"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-5">
@@ -294,28 +400,28 @@
                         <div class="recent-activity-item">
                             <div class="activity-icon" style="background-color: rgba(25, 135, 84, 0.1); color: #198754;"><i class="bi bi-person-plus"></i></div>
                             <div class="flex-grow-1">
-                                <div class="small fw-bold text-dark">Lucas Oliveira Santos cadastrado como novo aluno</div>
+                                <div class="small fw-bold text-dark">Lucas Oliveira Santos cadastrado</div>
                                 <div class="text-secondary" style="font-size: 0.75rem;">há 5 min</div>
                             </div>
                         </div>
                         <div class="recent-activity-item">
                             <div class="activity-icon" style="background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0;"><i class="bi bi-file-earmark-text"></i></div>
                             <div class="flex-grow-1">
-                                <div class="small fw-bold text-dark">Matrícula: Mariana Alves em React do Zero ao Avançado</div>
+                                <div class="small fw-bold text-dark">Matrícula: Mariana Alves em React</div>
                                 <div class="text-secondary" style="font-size: 0.75rem;">há 23 min</div>
                             </div>
                         </div>
                         <div class="recent-activity-item">
                             <div class="activity-icon" style="background-color: rgba(255, 193, 7, 0.15); color: #ffc107;"><i class="bi bi-plus-circle"></i></div>
                             <div class="flex-grow-1">
-                                <div class="small fw-bold text-dark">Nova turma criada: SQL Server Completo &mdash; Turma 02</div>
+                                <div class="small fw-bold text-dark">Nova turma criada: SQL Server</div>
                                 <div class="text-secondary" style="font-size: 0.75rem;">há 1h</div>
                             </div>
                         </div>
                         <div class="recent-activity-item">
                             <div class="activity-icon" style="background-color: rgba(26, 86, 219, 0.1); color: var(--blue-main)"><i class="bi bi-journal-check"></i></div>
                             <div class="flex-grow-1">
-                                <div class="small fw-bold text-dark">Curso "Flutter para Iniciantes" atualizado</div>
+                                <div class="small fw-bold text-dark">Curso "Flutter" atualizado</div>
                                 <div class="text-secondary" style="font-size: 0.75rem;">há 2h</div>
                             </div>
                         </div>
@@ -328,6 +434,41 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+        // Mecanismo inteligente para alternar sidebar
+        function toggleSidebar() {
+            if (window.innerWidth >= 992) {
+                // Modo Desktop: Encolhe e expande horizontalmente
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            } else {
+                // Modo Mobile: Desliza por cima da tela
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            }
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+
+        // Previne quebras se o usuário rotacionar o celular ou redimensionar a tela
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992) {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('expanded');
+            }
+        });
+
+        // Configurações à prova de erro dos gráficos ChartJS
         const ctxMatriculas = document.getElementById('matriculasChart').getContext('2d');
         new Chart(ctxMatriculas, {
             type: 'line',
@@ -342,7 +483,15 @@
                     fill: true
                 }]
             },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } }, x: { grid: { display: false }, ticks: { color: '#64748b' } } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } },
+                    x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                }
+            }
         });
 
         const ctxCategorias = document.getElementById('categoriasChart').getContext('2d');
@@ -357,7 +506,15 @@
                     borderRadius: 5
                 }]
             },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { display: false }, ticks: { color: '#64748b' } }, x: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { display: false }, ticks: { color: '#64748b' } },
+                    x: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } }
+                }
+            }
         });
 
         const ctxOcupacao = document.getElementById('ocupacaoChart').getContext('2d');
@@ -372,7 +529,15 @@
                     borderRadius: 5
                 }]
             },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } }, x: { grid: { display: false }, ticks: { color: '#64748b' } } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } },
+                    x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                }
+            }
         });
     </script>
 </body>
